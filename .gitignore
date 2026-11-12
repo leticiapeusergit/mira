@@ -1,0 +1,7 @@
+# macOS
+.DS_Store
+
+# Design reference files (kept locally, not versioned)
+*.pdf
+*.png
+job Profile/
