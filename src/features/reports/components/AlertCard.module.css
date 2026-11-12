@@ -1,0 +1,38 @@
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--error-50);
+}
+
+.icon[data-tone="warning"] {
+  background: var(--warning-50);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--gray-800);
+}
+
+.detail {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--gray-500);
+}

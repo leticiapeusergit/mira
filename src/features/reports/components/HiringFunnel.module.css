@@ -1,0 +1,132 @@
+.card {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--gray-800);
+}
+
+.chart {
+  display: flex;
+  gap: 4px;
+}
+
+.yAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 19px;
+  width: 55px;
+  padding-bottom: 30px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--gray-500);
+  text-align: right;
+}
+
+.plot {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bars {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  gap: 4px;
+  padding-bottom: 12px;
+}
+
+.column {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+}
+
+.barHover {
+  align-items: flex-end;
+}
+
+.bar {
+  position: relative;
+  display: block;
+  width: 66px;
+  border-radius: var(--round-soft);
+  transition: filter var(--duration-fast) var(--ease-out);
+}
+
+.barHover:hover .bar,
+.barHover:focus-within .bar {
+  filter: brightness(0.96) saturate(1.1);
+}
+
+/* Dark value bubble above the hovered bar. */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  padding: 8px 12px;
+  border-radius: var(--round-soft);
+  background: var(--gray-600);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--white);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  pointer-events: none;
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: translate(-50%, -6px) rotate(45deg);
+}
+
+.barHover:hover .tooltip,
+.barHover:focus-within .tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.xAxis {
+  display: flex;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--gray-500);
+  text-align: center;
+  white-space: pre-line;
+}
+
+.xAxis > span {
+  flex: 1;
+  min-width: 0;
+}

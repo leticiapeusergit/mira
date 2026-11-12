@@ -1,0 +1,27 @@
+.trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--gray-600);
+  white-space: nowrap;
+}
+
+.trend[data-tone="strong"] {
+  color: var(--gray-800);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 20px;
+}
+
+/* The source arrow points down; the "up" variant is the same glyph flipped. */
+.icon[data-direction="up"] img {
+  transform: scaleY(-1);
+}

@@ -1,0 +1,27 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  height: 24px;
+  padding: 4px 16px;
+  border-radius: var(--round-soft);
+  background: var(--bluegray-50);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--bluegray-600);
+  white-space: nowrap;
+  transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.tag[data-tone="error"] {
+  background: var(--error-50);
+  color: var(--error-600);
+  font-weight: 700;
+}
+
+.tag[data-tone="success"] {
+  background: var(--teal-50);
+  color: var(--teal-700);
+}

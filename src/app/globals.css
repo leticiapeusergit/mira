@@ -1,0 +1,118 @@
+/* Design tokens — names mirror the Figma "ATS New" styles. */
+:root {
+  /* Purple (brand) */
+  --purple-25: #fafaff;
+  --purple-50: #f4f3ff;
+  --purple-300: #bdb4fe;
+  --purple-400: #9b8afb;
+  --purple-500: #7a5af8;
+  --purple-600: #6938ef;
+  --purple-700: #5925dc;
+
+  /* Brand secondary (teal) */
+  --teal-25: #f2fffc;
+  --teal-50: #e8faf6;
+  --teal-100: #c1f5ea;
+  --teal-300: #7eebd5;
+  --teal-600: #34d3b3;
+  --teal-700: #25bd9f;
+  --teal-800: #0ea688;
+
+  /* Error */
+  --error-25: #fff5f6;
+  --error-50: #fff1f3;
+  --error-100: #ffe4e8;
+  --error-500: #f63d68;
+  --error-600: #e31b54;
+
+  /* Warning */
+  --warning-50: #fffaeb;
+  --warning-500: #f79009;
+
+  /* Gray */
+  --gray-25: #fdfdfd;
+  --gray-50: #fafafa;
+  --gray-200: #e9eaeb;
+  --gray-500: #717680;
+  --gray-600: #4e525b;
+  --gray-800: #1d222b;
+
+  /* Blue gray */
+  --bluegray-50: #f8f9fc;
+  --bluegray-100: #eaecf5;
+  --bluegray-200: #c8cce5;
+  --bluegray-400: #717bbc;
+  --bluegray-600: #3e4784;
+
+  --white: #ffffff;
+  --page-bg: #f7f7fb;
+  --divider: #ecf1f8;
+
+  /* Radius */
+  --round-soft: 4px;
+  --round-hard: 8px;
+  --round-harder: 12px;
+
+  /* Elevation */
+  --shadow-lighter: -14px 14px 30px 0 rgba(0, 0, 0, 0.1);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 140ms;
+  --duration-base: 200ms;
+
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--page-bg);
+  color: var(--gray-800);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+p,
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+img {
+  display: block;
+}
+
+:focus-visible {
+  outline: 2px solid var(--purple-500);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}

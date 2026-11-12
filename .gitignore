@@ -1,7 +1,17 @@
 # macOS
 .DS_Store
 
-# Design reference files (kept locally, not versioned)
-*.pdf
-*.png
-job Profile/
+# Design reference files in the project root (kept locally, not versioned)
+/*.pdf
+/*.png
+/job Profile/
+
+# Dependencies & build output
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Env
+.env*.local

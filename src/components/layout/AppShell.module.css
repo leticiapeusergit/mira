@@ -1,0 +1,22 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1280px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 16px;
+}

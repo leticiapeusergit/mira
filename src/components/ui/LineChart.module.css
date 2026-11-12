@@ -1,0 +1,81 @@
+.chart {
+  --tick-size: 10px;
+  --plot-height: 82px;
+  display: flex;
+  gap: 11px;
+  width: 100%;
+  padding: 16px;
+  background: var(--purple-25);
+}
+
+.chart[data-size="sm"] {
+  --tick-size: 9px;
+  --plot-height: 56px;
+}
+
+.yAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: var(--plot-height);
+  font-size: var(--tick-size);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--gray-500);
+  text-align: right;
+}
+
+.plotColumn {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.plot {
+  height: var(--plot-height);
+  background: var(--purple-50);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.line {
+  fill: none;
+  stroke: var(--purple-700);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.target {
+  stroke: var(--gray-800);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+
+.target[data-tone="error"] {
+  stroke: var(--error-600);
+}
+
+.xAxis {
+  display: flex;
+  gap: 4px;
+  font-size: var(--tick-size);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--gray-500);
+  text-align: center;
+}
+
+.xAxis > span {
+  flex: 1;
+  min-width: 0;
+}

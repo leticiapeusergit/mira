@@ -1,0 +1,139 @@
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gray-800);
+}
+
+.description {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--gray-600);
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  height: 56px;
+  padding: 8px 16px;
+  border-radius: var(--round-hard);
+  background: var(--teal-50);
+}
+
+.badge[data-tone="error"] {
+  background: var(--error-25);
+}
+
+.count {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--teal-700);
+}
+
+.badge[data-tone="error"] .count {
+  color: var(--error-600);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: var(--round-soft);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.toggle:hover {
+  background: var(--purple-50);
+}
+
+.toggle img {
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.toggle[data-open] img {
+  transform: rotate(180deg);
+}
+
+/* Height animation via grid rows: 0fr → 1fr. */
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+}
+
+.panel[data-open] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.months {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+.panel[data-open] .months {
+  padding-top: 8px;
+}
+
+.month {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--gray-50);
+}
+
+.monthName {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1;
+  color: var(--gray-800);
+}
+
+.monthCount {
+  min-width: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  color: var(--teal-700);
+}
+
+.monthCount[data-tone="error"] {
+  color: var(--error-600);
+}

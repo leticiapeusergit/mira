@@ -1,0 +1,45 @@
+.field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding: 0 12px;
+  background: var(--white);
+  border: 1px solid var(--bluegray-200);
+  border-radius: var(--round-soft);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.field:hover {
+  border-color: var(--bluegray-400);
+}
+
+.field:focus-within {
+  outline: 2px solid var(--purple-500);
+  outline-offset: 1px;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--gray-500);
+  white-space: nowrap;
+}
+
+.value {
+  color: var(--gray-800);
+}
+
+/* Native select stays on top for real keyboard + screen reader behaviour. */
+.native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}

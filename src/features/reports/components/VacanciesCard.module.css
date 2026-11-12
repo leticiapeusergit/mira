@@ -1,0 +1,61 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 4px;
+}
+
+.title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+}
+
+.bar {
+  display: flex;
+  height: 15px;
+  border-radius: 4px;
+  overflow: visible;
+}
+
+/* HoverCard root becomes the flex item; its share of the bar comes from the fill's flex-grow. */
+.segment {
+  flex-basis: 0;
+  min-width: 0;
+  height: 100%;
+}
+
+.segment:first-child .fill {
+  border-radius: 4px 0 0 4px;
+}
+
+.segment:last-child .fill {
+  border-radius: 0 4px 4px 0;
+}
+
+.fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: filter var(--duration-fast) var(--ease-out);
+}
+
+.segment:hover .fill {
+  filter: brightness(0.94);
+}
+
+.positive {
+  color: var(--teal-700);
+}
+
+.muted {
+  color: var(--gray-500);
+}

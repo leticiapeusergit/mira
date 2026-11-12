@@ -1,0 +1,54 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pageHeader {
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--bluegray-100);
+}
+
+.pageTitle {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--purple-600);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+}
+
+.sectionTitle {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--gray-800);
+}
+
+.row {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.row > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.alignStart {
+  align-items: flex-start;
+}
