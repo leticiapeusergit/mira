@@ -1,0 +1,174 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title {
+  padding-bottom: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.month {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--gray-600);
+}
+
+.track {
+  display: flex;
+  gap: 2px;
+  height: 15px;
+  transform-origin: left;
+  animation: grow-right 800ms var(--ease-out) backwards;
+  animation-delay: calc(150ms + var(--row, 0) * 70ms);
+}
+
+@keyframes grow-right {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.segment {
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+
+.segment:hover .fill {
+  transform: scaleY(1.25);
+}
+
+.fill[data-dim] {
+  opacity: 0.35;
+}
+
+/* Tick labels sit exactly at their value; ends align to the track edges. */
+.axis {
+  position: relative;
+  height: 12px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--gray-500);
+}
+
+.axis > span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.axis > span[data-edge="start"] {
+  transform: none;
+}
+
+.axis > span[data-edge="end"] {
+  transform: translateX(-100%);
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--divider-strong);
+  list-style: none;
+}
+
+.legendItem {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  cursor: default;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.legendItem[data-dim] {
+  opacity: 0.4;
+}
+
+.legendLabel {
+  min-height: 2.2em;
+  font-size: 10px;
+  line-height: 1.1;
+  color: var(--gray-600);
+  white-space: pre-line;
+}
+
+.swatch {
+  width: 20px;
+  height: 7px;
+  border-radius: 4px;
+}
+
+/* Black tooltip, matching the line-chart value tooltip. */
+.tooltip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--round-soft);
+  background: #000;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--white);
+  white-space: nowrap;
+  box-shadow: var(--shadow-lighter);
+}
+
+.tooltip strong {
+  font-weight: 800;
+}
+
+.tooltipSwatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+/* Secondary text on black: light enough to read (gray-300 ≈ 12:1 contrast). */
+.tooltipShare {
+  color: var(--gray-300);
+}

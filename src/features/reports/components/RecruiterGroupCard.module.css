@@ -94,7 +94,7 @@
   opacity: 1;
 }
 
-.months {
+.people {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -105,35 +105,92 @@
   list-style: none;
 }
 
-.panel[data-open] .months {
+.panel[data-open] .people {
   padding-top: 8px;
 }
 
-.month {
+.person {
   display: flex;
   align-items: center;
-  gap: 17px;
+  gap: 10px;
   padding: 8px 12px;
   border-radius: 8px;
   background: var(--gray-50);
 }
 
-.monthName {
+.avatar {
+  flex-shrink: 0;
+  border: 1px solid var(--gray-200);
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.personMain {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.personTop {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.name {
   font-size: 12px;
-  line-height: 1;
+  font-weight: 700;
+  line-height: 1.4;
   color: var(--gray-800);
+  white-space: nowrap;
 }
 
-.monthCount {
-  min-width: 10px;
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1;
-  text-align: center;
-  color: var(--teal-700);
+.note {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--gray-500);
+  white-space: nowrap;
 }
 
-.monthCount[data-tone="error"] {
-  color: var(--error-600);
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Compact tags inside the list. */
+.tags > span {
+  height: 20px;
+  min-height: 20px;
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.streak {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.streakDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--gray-200);
+}
+
+.streakDot[data-on][data-tone="error"] {
+  background: var(--error-500);
+}
+
+.streakDot[data-on][data-tone="success"] {
+  background: var(--teal-600);
+}
+
+.streakDot[data-current] {
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 3px var(--gray-300);
 }

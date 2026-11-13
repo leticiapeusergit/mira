@@ -1,178 +1,275 @@
-import type { ChartPoint } from "@/components/ui/LineChart";
-import type { MetricHistory } from "@/components/ui/HistoryCard";
 import type { TagTone } from "@/components/ui/Tag";
+import type { HistorySpec } from "./history";
 
 /**
  * Mock data for the Reports dashboard, mirroring the Figma "ATS New › Reports" frame.
  * Replace with API data once the reporting endpoints exist.
  */
 
-const MONTHS = ["May", "Jun", "Jul", "Aug", "Sep", "Oct"] as const;
+/* ---------- Time in process (stacked timelines) ---------- */
 
-export const history = (values: number[]): ChartPoint[] =>
-  MONTHS.map((label, i) => ({ label, value: values[i] ?? 0 }));
+export type TimelineStage = { key: string; label: string; color: string };
+export type TimelineRow = { month: string; days: number[] };
+export type StageTimeline = { title: string; stages: TimelineStage[]; rows: TimelineRow[] };
 
-const DEFAULT_SERIES = history([30, 20, 65, 30, 95, 70]);
-const DEFAULT_TARGET = 110;
+/** Business days spent per stage, per month (values measured from the Figma mock). */
+const PROCESS_DAYS: TimelineRow[] = [
+  { month: "October", days: [4.9, 6.8, 5.6, 2.8, 2.4, 3.5] },
+  { month: "September", days: [4.1, 8.2, 2.6, 4.0, 3.8, 3.8] },
+  { month: "August", days: [4.0, 9.1, 3.6, 2.2, 2.7, 5.5] },
+  { month: "July", days: [3.9, 5.6, 3.9, 4.1, 4.0, 4.6] },
+  { month: "June", days: [5.2, 5.2, 3.2, 5.1, 3.0, 6.1] },
+  { month: "May", days: [4.0, 1.7, 7.7, 5.2, 4.9, 3.2] },
+];
 
-const avatar = (file: string, name: string) => ({ src: `/assets/avatars/${file}`, name });
+export const TIMELINE_MAX_DAYS = 30;
 
-const RECRUITERS = [
-  avatar("r1.png", "Daniel Park"),
-  avatar("r2.png", "Marcus Lee"),
-  avatar("r3.png", "Andre Silva"),
-  avatar("r4.png", "Tom Becker"),
-  avatar("r5.png", "Lucas Reyes"),
-  avatar("r6.png", "Noah Klein"),
-  avatar("r1.png", "Ethan Cole"),
-  avatar("r2.png", "Owen Brooks"),
+/** Stage labels use "\n" where the Figma legend wraps. */
+export const PROCESS_EFFICIENCY: StageTimeline[] = [
+  {
+    title: "Prediktive Process Time",
+    stages: [
+      { key: "hr-scheduling", label: "HR\nScheduling", color: "var(--bluegray-100)" },
+      { key: "hr-interview", label: "HR\nInterview", color: "var(--bluegray-200)" },
+      { key: "technical-review", label: "Technical\nReview", color: "var(--bluegray-300)" },
+      { key: "technical-evaluation", label: "Technical\nEvaluation", color: "var(--bluegray-500)" },
+      { key: "final-decision", label: "Final\nDecision", color: "var(--brand-950)" },
+      { key: "tests", label: "Tests", color: "var(--gray-300)" },
+    ],
+    rows: PROCESS_DAYS,
+  },
+  {
+    title: "Job Application Process Time",
+    stages: [
+      { key: "technical-evaluation", label: "Technical\nEvaluation", color: "var(--purple-100)" },
+      { key: "passed-tech", label: "Passed Tech\nAssessment", color: "var(--purple-200)" },
+      { key: "presented", label: "Presented\nto Client", color: "var(--purple-300)" },
+      { key: "offer", label: "Offer\nExtended", color: "var(--purple-500)" },
+      { key: "hired", label: "Hired", color: "var(--purple-900)" },
+    ],
+    rows: PROCESS_DAYS.map((r) => ({ month: r.month, days: r.days.slice(0, 5) })),
+  },
 ];
 
 /* ---------- Team performance ---------- */
 
-export type Alert = { tone: "error" | "warning"; title: string; detail: string };
+export type KpiKey = "presented-hired" | "time-to-first-presentation" | "presentation-accuracy" | "technical-pass-rate";
+
+/** Each alert points at the KPI it's about; clicking it focuses that KPI card. */
+export type Alert = { tone: "error" | "warning"; title: string; detail: string; kpi: KpiKey };
 
 export const ALERTS: Alert[] = [
-  { tone: "error", title: "Technical pass rate declining", detail: "68% vs. 75% target · Down 2 pp" },
-  { tone: "error", title: "Presentation accuracy below target", detail: "82% vs. 95% target · No recruiters on target" },
-  { tone: "warning", title: "2 recruiters are slow to present", detail: "16–18 days vs. 14-day target" },
+  { tone: "error", title: "Technical pass rate declining", detail: "68% vs. 75% target · Down 2 pp", kpi: "technical-pass-rate" },
+  {
+    tone: "error",
+    title: "Presentation accuracy below target",
+    detail: "82% vs. 95% target · No recruiters on target",
+    kpi: "presentation-accuracy",
+  },
+  { tone: "warning", title: "2 recruiters are slow to present", detail: "16–18 days vs. 14-day target", kpi: "time-to-first-presentation" },
 ];
 
 export type Kpi = {
+  id: KpiKey;
   title: string;
   target: string;
-  value: string;
   unit: string;
   /** "%" sits inline next to the value; "Days" stacks below it. */
   unitPlacement: "inline" | "below";
   tone: "error" | "success";
+  /** Copy for the change vs the previous period; must agree with `history`. */
   trend: { direction: "up" | "down"; text: string };
-  series: ChartPoint[];
+  /** Value in the selected period and in the one before it; the badge shows `current`. */
+  history: HistorySpec;
   targetValue: number;
+  /** Y-axis in the KPI's own unit, so the chart measures the same thing as the badge. */
+  axis: "percent" | "days";
 };
 
 export const KPIS: Kpi[] = [
   {
+    id: "presented-hired",
     title: "Presented\n→ Hired",
     target: "Target: 85%",
-    value: "22",
     unit: "%",
     unitPlacement: "inline",
     tone: "error",
     trend: { direction: "up", text: "+2% than prev period" },
-    series: DEFAULT_SERIES,
-    targetValue: DEFAULT_TARGET,
+    history: { current: 22, previous: 20, seed: 1, min: 0, max: 100 },
+    targetValue: 85,
+    axis: "percent",
   },
   {
+    id: "time-to-first-presentation",
     title: "Time to First Presentation",
     target: "Target: 14 days",
-    value: "12",
     unit: "Days",
     unitPlacement: "below",
     tone: "success",
     trend: { direction: "up", text: "2 days faster than prev period" },
-    series: DEFAULT_SERIES,
-    targetValue: DEFAULT_TARGET,
+    history: { current: 12, previous: 14, seed: 2, min: 0, max: 20, lowerIsBetter: true },
+    targetValue: 14,
+    axis: "days",
   },
   {
+    id: "presentation-accuracy",
     title: "Presentation Accuracy",
     target: "Target: 95%",
-    value: "82",
     unit: "%",
     unitPlacement: "inline",
     tone: "error",
     trend: { direction: "up", text: "+2 pts vs previous period" },
-    series: DEFAULT_SERIES,
-    targetValue: DEFAULT_TARGET,
+    history: { current: 82, previous: 80, seed: 3, min: 0, max: 100 },
+    targetValue: 95,
+    axis: "percent",
   },
   {
+    id: "technical-pass-rate",
     title: "Technical\nPass Rate",
     target: "Target: 95%",
-    value: "68",
     unit: "%",
     unitPlacement: "inline",
     tone: "error",
-    trend: { direction: "up", text: "+2 pts vs previous period" },
-    series: DEFAULT_SERIES,
-    targetValue: DEFAULT_TARGET,
+    // Matches the alert: "Down 2 pp".
+    trend: { direction: "down", text: "-2 pts vs previous period" },
+    history: { current: 68, previous: 70, seed: 4, min: 0, max: 100 },
+    targetValue: 95,
+    axis: "percent",
   },
 ];
 
 export type VacancySegment = {
   key: "filled" | "cancelled" | "open";
   label: string;
-  value: number;
   color: string;
-  history: MetricHistory;
+  history: HistorySpec;
 };
 
-export const VACANCIES: { segments: VacancySegment[]; trend: { value: string; text: string } } = {
-  segments: [
-    {
-      key: "filled",
-      label: "Filled",
-      value: 12,
-      color: "var(--teal-600)",
-      history: { value: "Filled: 12", trend: { direction: "up", text: "+6 vs previous period" }, series: DEFAULT_SERIES, target: DEFAULT_TARGET },
-    },
-    {
-      key: "cancelled",
-      label: "Cancelled",
-      value: 3,
-      color: "var(--gray-500)",
-      history: { value: "Cancelled: 3", trend: { direction: "down", text: "+1 vs previous period" }, series: DEFAULT_SERIES, target: DEFAULT_TARGET },
-    },
-    {
-      key: "open",
-      label: "Open",
-      value: 45,
-      color: "var(--purple-300)",
-      history: { value: "Open: 45", trend: { direction: "down", text: "-2 vs previous period" }, series: DEFAULT_SERIES, target: DEFAULT_TARGET },
-    },
-  ],
-  trend: { value: "+6", text: "from past month" },
-};
+export const VACANCIES: VacancySegment[] = [
+  { key: "filled", label: "Filled", color: "var(--teal-600)", history: { current: 12, previous: 6, seed: 11 } },
+  {
+    key: "cancelled",
+    label: "Cancelled",
+    color: "var(--gray-500)",
+    history: { current: 3, previous: 2, seed: 12, lowerIsBetter: true },
+  },
+  { key: "open", label: "Open", color: "var(--purple-300)", history: { current: 45, previous: 47, seed: 13, lowerIsBetter: true } },
+];
 
 /* ---------- Recruiter performance ---------- */
 
-export type RecruiterGroup = {
-  title: string;
-  description: string;
-  trend: { direction: "up" | "down"; text: string };
-  tone: "success" | "error";
-  recruiters: typeof RECRUITERS;
-  maxAvatars: number;
-  months: { month: string; recruiters: typeof RECRUITERS }[];
-  defaultOpen?: boolean;
+const avatar = (file: string) => `/assets/avatars/${file}`;
+
+export type KpiResult = { label: string; value: string; met: boolean };
+
+export type Recruiter = {
+  name: string;
+  avatar: string;
+  /** Results in the selected period; groups show the misses (or all hits). */
+  kpis: KpiResult[];
+  /** Whether the recruiter was in this group in each period, oldest first (last = current). */
+  streak: boolean[];
 };
 
+export type RecruiterGroup = {
+  id: "meeting" | "needs-review";
+  title: string;
+  description: string;
+  tone: "success" | "error";
+  maxAvatars: number;
+  /** Group size in the selected and previous period. */
+  history: HistorySpec;
+  recruiters: Recruiter[];
+};
+
+const kpi = (label: string, value: string, met: boolean): KpiResult => ({ label, value, met });
+
+/** Same people as the table below, so tags and table always agree. */
 export const RECRUITER_GROUPS: RecruiterGroup[] = [
   {
+    id: "meeting",
     title: "Meeting All Targets",
     description: "Recruiters meeting all KPI targets",
-    trend: { direction: "up", text: "+2 vs previous period" },
     tone: "success",
-    recruiters: RECRUITERS.slice(0, 4),
     maxAvatars: 4,
-    months: [
-      { month: "September", recruiters: RECRUITERS.slice(0, 2) },
-      { month: "August", recruiters: RECRUITERS.slice(0, 3) },
+    history: { current: 4, previous: 2, seed: 21, min: 0 },
+    recruiters: [
+      {
+        name: "Luna Garcia",
+        avatar: avatar("luna.png"),
+        kpis: [kpi("Hired", "90%", true), kpi("Pres. Accuracy", "80%", true), kpi("Tech Pass", "13 d", true)],
+        streak: [false, true, true, true, true, true],
+      },
+      {
+        name: "Daniel Park",
+        avatar: avatar("r1.png"),
+        kpis: [kpi("Hired", "88%", true), kpi("Pres. Accuracy", "96%", true)],
+        streak: [true, true, false, true, true, true],
+      },
+      {
+        name: "Marcus Lee",
+        avatar: avatar("r2.png"),
+        kpis: [kpi("Hired", "86%", true), kpi("Pres. Accuracy", "95%", true)],
+        streak: [false, false, false, false, true, true],
+      },
+      {
+        name: "Andre Silva",
+        avatar: avatar("r3.png"),
+        kpis: [kpi("Hired", "91%", true), kpi("Tech Pass", "78%", true)],
+        streak: [false, false, false, false, false, true],
+      },
     ],
   },
   {
+    id: "needs-review",
     title: "Needs Review",
     description: "Recruiters requiring attention.",
-    trend: { direction: "up", text: "+2 vs previous period" },
     tone: "error",
-    recruiters: RECRUITERS.slice(0, 7),
     maxAvatars: 5,
-    defaultOpen: true,
-    months: [
-      { month: "September", recruiters: RECRUITERS.slice(0, 5) },
-      { month: "August", recruiters: RECRUITERS.slice(0, 3) },
-      { month: "July", recruiters: RECRUITERS.slice(0, 3) },
-      { month: "June", recruiters: RECRUITERS.slice(0, 3) },
-      { month: "May", recruiters: RECRUITERS.slice(0, 5) },
+    history: { current: 7, previous: 5, seed: 22, min: 0 },
+    recruiters: [
+      {
+        name: "Isabella Torres",
+        avatar: avatar("isabella.png"),
+        kpis: [kpi("Hired", "30%", false), kpi("Pres. Accuracy", "61%", false)],
+        streak: [false, true, true, true, true, true],
+      },
+      {
+        name: "Camila Rojas",
+        avatar: avatar("camila.png"),
+        kpis: [kpi("Time to First Pres", "25%", false)],
+        streak: [false, false, false, true, true, true],
+      },
+      {
+        name: "Sofia Martinez",
+        avatar: avatar("sofia.png"),
+        kpis: [kpi("Time to First Pres", "21%", false)],
+        streak: [true, false, false, false, true, true],
+      },
+      {
+        name: "Tom Becker",
+        avatar: avatar("r4.png"),
+        kpis: [kpi("Time to First Pres", "18 d", false), kpi("Tech Pass", "64%", false)],
+        streak: [false, false, false, false, true, true],
+      },
+      {
+        name: "Lucas Reyes",
+        avatar: avatar("r5.png"),
+        kpis: [kpi("Time to First Pres", "16 d", false)],
+        streak: [false, false, false, false, false, true],
+      },
+      {
+        name: "Noah Klein",
+        avatar: avatar("r6.png"),
+        kpis: [kpi("Pres. Accuracy", "70%", false)],
+        streak: [true, true, false, false, false, true],
+      },
+      {
+        name: "Ethan Cole",
+        avatar: avatar("r1.png"),
+        kpis: [kpi("Hired", "62%", false)],
+        streak: [false, false, false, false, false, true],
+      },
     ],
   },
 ];
@@ -180,9 +277,10 @@ export const RECRUITER_GROUPS: RecruiterGroup[] = [
 export type MetricCell = {
   value: string;
   tone: TagTone;
-  /** Headline shown in the hover card; defaults to "<column> <value>". */
-  detail?: string;
-  trend?: { direction: "up" | "down"; text: string };
+  /** Value in the previous period; defaults to a small deterministic change. */
+  previous?: number;
+  /** Extra context in the hover headline, e.g. "(7/28)". */
+  note?: string;
 };
 
 export type RecruiterRow = {
@@ -204,16 +302,16 @@ const cell = (value: string, tone: TagTone = "neutral", extra: Partial<MetricCel
 export const RECRUITER_ROWS: RecruiterRow[] = [
   {
     name: "Camila Rojas",
-    avatar: "/assets/avatars/camila.png",
+    avatar: avatar("camila.png"),
     present: cell("28"),
     timeToFirstPres: cell("25%", "error"),
     techPass: cell("9 d"),
-    hired: cell("89%", "success", { detail: "Hired 89% (7/28)", trend: { direction: "up", text: "+4% vs. prev" } }),
+    hired: cell("89%", "success", { previous: 85, note: "(7/28)" }),
     presAccuracy: cell("75%"),
   },
   {
     name: "Sofia Martinez",
-    avatar: "/assets/avatars/sofia.png",
+    avatar: avatar("sofia.png"),
     present: cell("26"),
     timeToFirstPres: cell("21%", "error"),
     techPass: cell("11 d", "success"),
@@ -222,7 +320,7 @@ export const RECRUITER_ROWS: RecruiterRow[] = [
   },
   {
     name: "Luna Garcia",
-    avatar: "/assets/avatars/luna.png",
+    avatar: avatar("luna.png"),
     present: cell("24"),
     timeToFirstPres: cell("87%"),
     techPass: cell("13 d"),
@@ -231,7 +329,7 @@ export const RECRUITER_ROWS: RecruiterRow[] = [
   },
   {
     name: "Isabella Torres",
-    avatar: "/assets/avatars/isabella.png",
+    avatar: avatar("isabella.png"),
     present: cell("19"),
     timeToFirstPres: cell("87%"),
     techPass: cell("13 d"),
@@ -248,34 +346,45 @@ export const RECRUITER_COLUMNS: { key: keyof Omit<RecruiterRow, "name" | "avatar
   { key: "presAccuracy", label: "Pres. Accuracy", target: "T: +95%" },
 ];
 
-export const CELL_HISTORY = { series: DEFAULT_SERIES, target: DEFAULT_TARGET };
+/** Splits "25%" / "9 d" / "28" into a number and its unit. */
+export function parseMetric(value: string): { amount: number; unit: "%" | "d" | "" } {
+  const amount = Number.parseFloat(value);
+  const unit = value.includes("%") ? "%" : /\bd\b/.test(value) ? "d" : "";
+  return { amount, unit };
+}
+
+/** Target number from a column header like "T:+85%" or "T:-14d", if its unit matches the cell. */
+export function columnTarget(target: string | undefined, unit: string): number | undefined {
+  if (!target) return undefined;
+  const targetUnit = target.includes("%") ? "%" : target.includes("d") ? "d" : "";
+  if (targetUnit !== unit) return undefined;
+  const n = Number.parseFloat(target.replace(/[^\d.]/g, ""));
+  return Number.isFinite(n) ? n : undefined;
+}
 
 /* ---------- Hiring funnel ---------- */
 
 export type FunnelStage = {
   label: string;
-  value: number;
   color: string;
-  trend: { direction: "up" | "down"; text: string };
+  history: HistorySpec;
 };
 
 export const FUNNEL_MAX = 215;
 
 export const FUNNEL: FunnelStage[] = [
-  { label: "Technically Evaluated", value: 215, color: "rgba(193, 245, 234, 0.83)", trend: { direction: "up", text: "+4% vs. prev" } },
-  { label: "Passed Tech Assessment", value: 146, color: "var(--teal-300)", trend: { direction: "up", text: "+4% vs. prev" } },
-  { label: "Presented\nto Client", value: 132, color: "var(--purple-300)", trend: { direction: "up", text: "+2% vs. prev" } },
-  { label: "Interviewed\nby Client", value: 85, color: "var(--purple-400)", trend: { direction: "down", text: "-3% vs. prev" } },
-  { label: "Offer\nExtended", value: 25, color: "var(--purple-500)", trend: { direction: "down", text: "-1% vs. prev" } },
-  { label: "Hired", value: 12, color: "var(--purple-600)", trend: { direction: "up", text: "+2% vs. prev" } },
+  { label: "Technically Evaluated", color: "rgba(193, 245, 234, 0.83)", history: { current: 215, previous: 207, seed: 31 } },
+  { label: "Passed Tech Assessment", color: "var(--teal-300)", history: { current: 146, previous: 140, seed: 32 } },
+  { label: "Presented\nto Client", color: "var(--purple-300)", history: { current: 132, previous: 129, seed: 33 } },
+  { label: "Interviewed\nby Client", color: "var(--purple-400)", history: { current: 85, previous: 88, seed: 34 } },
+  { label: "Offer\nExtended", color: "var(--purple-500)", history: { current: 25, previous: 26, seed: 35 } },
+  { label: "Hired", color: "var(--purple-600)", history: { current: 12, previous: 11, seed: 36 } },
 ];
 
 export const FUNNEL_LEGEND = [
   { label: "Internal", color: "var(--teal-600)" },
   { label: "External", color: "var(--purple-500)" },
 ];
-
-export const FUNNEL_HISTORY = { series: DEFAULT_SERIES, target: DEFAULT_TARGET };
 
 export const LOWEST_CONVERSION = {
   from: "Interviewed",

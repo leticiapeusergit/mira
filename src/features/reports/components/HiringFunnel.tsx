@@ -1,14 +1,20 @@
+"use client";
+
 import { Card } from "@/components/ui/Card";
 import { HistoryCard } from "@/components/ui/HistoryCard";
 import { HoverCard } from "@/components/ui/HoverCard";
 import { Legend } from "@/components/ui/Legend";
-import { FUNNEL, FUNNEL_HISTORY, FUNNEL_LEGEND, FUNNEL_MAX } from "../data";
+import { FUNNEL, FUNNEL_LEGEND, FUNNEL_MAX } from "../data";
+import { countAxis, periodSeries, trendFromSeries } from "../history";
+import { useReportsPeriod } from "../ReportsPeriodContext";
 import styles from "./HiringFunnel.module.css";
 
 const BAR_AREA = 153; // px height of the tallest bar
 const TICKS = [200, 150, 100, 50, 0];
 
 export function HiringFunnel() {
+  const { windows } = useReportsPeriod();
+
   return (
     <Card as="article" className={styles.card}>
       <div className={styles.header}>
@@ -27,32 +33,34 @@ export function HiringFunnel() {
         <div className={styles.plot}>
           <div className={styles.bars}>
             {FUNNEL.map((stage, i) => {
+              const value = stage.history.current;
               const prev = FUNNEL[i - 1];
-              const pct = prev ? ` (${Math.round((stage.value / prev.value) * 100)}%)` : "";
+              const pct = prev ? ` (${Math.round((value / prev.history.current) * 100)}%)` : "";
               const name = stage.label.replace("\n", " ");
+              const series = periodSeries(windows, stage.history);
               return (
                 <div key={stage.label} className={styles.column}>
                   <HoverCard
                     className={styles.barHover}
-                    align={i === 0 ? "start" : i === FUNNEL.length - 1 ? "end" : "center"}
-                    label={`${name}: ${stage.value}`}
+                    label={`${name}: ${value}`}
                     content={
                       <HistoryCard
                         label={`${name}:`}
-                        value={`${stage.value}${pct}`}
-                        trend={stage.trend}
-                        {...FUNNEL_HISTORY}
+                        value={`${value}${pct}`}
+                        trend={trendFromSeries(series, { mode: "percent" })}
+                        series={series}
+                        axis={countAxis(series.map((p) => p.value))}
                       />
                     }
                   >
                     <span
                       className={styles.bar}
                       style={{
-                        height: Math.max(4, (stage.value / FUNNEL_MAX) * BAR_AREA),
+                        height: Math.max(4, (value / FUNNEL_MAX) * BAR_AREA),
                         background: stage.color,
                       }}
                     >
-                      <span className={styles.tooltip}>{stage.value}</span>
+                      <span className={styles.tooltip}>{value}</span>
                     </span>
                   </HoverCard>
                 </div>

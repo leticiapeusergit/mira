@@ -1,0 +1,107 @@
+.calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.month {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--round-soft);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.nav:hover {
+  background: var(--purple-50);
+}
+
+.nav img[data-dir="prev"] {
+  transform: rotate(90deg);
+}
+
+.nav img[data-dir="next"] {
+  transform: rotate(-90deg);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 2px;
+}
+
+.weekday {
+  padding: 4px 0;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--gray-500);
+}
+
+/* Cell = range band; inner span = the day circle. */
+.day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-800);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.day > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.day:hover > span {
+  background: var(--purple-50);
+}
+
+.day[data-outside] {
+  color: var(--gray-400);
+}
+
+.day[data-today] > span {
+  box-shadow: inset 0 0 0 1px var(--purple-300);
+}
+
+.day[data-in-range] {
+  background: var(--purple-50);
+}
+
+.day[data-edge="start"] {
+  background: linear-gradient(to right, transparent 50%, var(--purple-50) 50%);
+}
+
+.day[data-edge="end"] {
+  background: linear-gradient(to left, transparent 50%, var(--purple-50) 50%);
+}
+
+.day[data-edge] > span {
+  background: var(--purple-600);
+  color: var(--white);
+  font-weight: 700;
+}

@@ -1,0 +1,31 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 16px;
+  /* 30% background only, so the white cards inside stay fully opaque. */
+  background: color-mix(in srgb, var(--purple-200) 30%, transparent);
+  animation: soft-in var(--duration-enter) var(--ease-out) backwards;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--gray-800);
+}
+
+.charts {
+  display: flex;
+  gap: 16px;
+}
+
+.charts > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.charts > :nth-child(2) {
+  --stagger: 1;
+}

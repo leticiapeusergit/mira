@@ -1,7 +1,32 @@
 .alert {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 13px;
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--round-harder);
+  background: var(--white);
+  text-align: left;
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  transition: outline-color var(--duration-base) var(--ease-out);
+  animation: soft-in var(--duration-enter) var(--ease-out) backwards;
+  animation-delay: calc(var(--stagger, 0) * 60ms);
+}
+
+/* Hover and selected: gray border only — no movement, no shadow. */
+.alert:hover {
+  outline-color: var(--ring-hover-color);
+}
+
+.alert[aria-pressed="true"] {
+  outline-color: var(--ring-selected-color);
+}
+
+.alert:focus-visible {
+  outline: 2px solid var(--purple-500);
+  outline-offset: 2px;
 }
 
 .icon {
@@ -19,6 +44,7 @@
 
 .text {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
@@ -35,4 +61,25 @@
   font-size: 12px;
   line-height: 1.4;
   color: var(--gray-500);
+}
+
+/* "Clear" hint fades in only on the active alert; pinned to the corner so text never reflows. */
+.clear {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--gray-500);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+
+.alert[aria-pressed="true"] .clear {
+  opacity: 1;
+  transform: none;
 }

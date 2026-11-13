@@ -68,6 +68,13 @@
   object-fit: cover;
 }
 
-.table td :hover > span {
-  box-shadow: 0 0 0 1px var(--bluegray-200);
+.metric > span {
+  transition:
+    transform var(--duration-base) var(--ease-out),
+    filter var(--duration-base) var(--ease-out);
+}
+
+.metric:hover > span {
+  transform: translateY(-1px);
+  filter: brightness(0.97);
 }

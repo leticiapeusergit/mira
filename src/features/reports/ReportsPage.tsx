@@ -1,64 +1,48 @@
-import { AlertCard } from "./components/AlertCard";
-import { KpiCard } from "./components/KpiCard";
-import { VacanciesCard } from "./components/VacanciesCard";
+import { TeamPerformanceSection } from "./components/TeamPerformanceSection";
 import { RecruiterGroupCard } from "./components/RecruiterGroupCard";
 import { RecruitersTable } from "./components/RecruitersTable";
 import { HiringFunnel } from "./components/HiringFunnel";
 import { StageConversion } from "./components/StageConversion";
-import { TeamFilters } from "./components/TeamFilters";
-import { ALERTS, KPIS, RECRUITER_GROUPS } from "./data";
+import { ProcessEfficiencyPanel } from "./components/ProcessEfficiencyPanel";
+import { RECRUITER_GROUPS } from "./data";
+import { ReportsPeriodProvider } from "./ReportsPeriodContext";
 import styles from "./ReportsPage.module.css";
 
 export function ReportsPage() {
   return (
+    <ReportsPeriodProvider>
     <div className={styles.page}>
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Reports</h1>
       </header>
 
-      <section className={styles.section} aria-labelledby="team-performance">
-        <div className={styles.sectionHeader}>
-          <h2 id="team-performance" className={styles.sectionTitle}>
-            Team Performance
-          </h2>
-          <TeamFilters />
-        </div>
+      <div className={styles.sections}>
+        <ProcessEfficiencyPanel />
 
-        <div className={styles.row}>
-          {ALERTS.map((alert) => (
-            <AlertCard key={alert.title} {...alert} />
-          ))}
-        </div>
+        <TeamPerformanceSection />
 
-        <div className={styles.row}>
-          {KPIS.map((kpi) => (
-            <KpiCard key={kpi.title} {...kpi} />
-          ))}
-        </div>
+        <section className={styles.section} aria-labelledby="recruiter-performance">
+          <div className={styles.sectionHeader}>
+            <h2 id="recruiter-performance" className={styles.sectionTitle}>
+              Recruiter Performance
+            </h2>
+          </div>
 
-        <VacanciesCard />
-      </section>
+          <div className={`${styles.row} ${styles.alignStart}`}>
+            {RECRUITER_GROUPS.map((group) => (
+              <RecruiterGroupCard key={group.id} {...group} />
+            ))}
+          </div>
 
-      <section className={styles.section} aria-labelledby="recruiter-performance">
-        <div className={styles.sectionHeader}>
-          <h2 id="recruiter-performance" className={styles.sectionTitle}>
-            Recruiter Performance
-          </h2>
-        </div>
+          <RecruitersTable />
 
-        <div className={`${styles.row} ${styles.alignStart}`}>
-          {RECRUITER_GROUPS.map((group) => (
-            <RecruiterGroupCard key={group.title} {...group} />
-          ))}
-        </div>
-
-        <RecruitersTable />
-
-        <div className={styles.row}>
-          <HiringFunnel />
-          <StageConversion />
-        </div>
-      </section>
+          <div className={styles.row}>
+            <HiringFunnel />
+            <StageConversion />
+          </div>
+        </section>
+      </div>
     </div>
+    </ReportsPeriodProvider>
   );
 }

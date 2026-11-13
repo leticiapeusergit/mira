@@ -1,53 +1,65 @@
-.root {
-  position: relative;
-  display: inline-flex;
-}
-
 .trigger {
   display: inline-flex;
-  width: 100%;
-  height: 100%;
   border-radius: var(--round-soft);
   cursor: pointer;
 }
 
+.trigger:focus {
+  outline: none;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--purple-500);
+  outline-offset: 2px;
+}
+
+/* Positioned with a transform from HoverCard.tsx; it never takes pointer events. */
 .card {
-  position: absolute;
-  top: calc(100% + var(--offset));
-  z-index: 20;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
   display: block;
   width: max-content;
   min-width: 262px;
-  opacity: 0;
-  visibility: hidden;
   pointer-events: none;
-  transform: translate(var(--x, 0), -4px);
+  will-change: transform;
+}
+
+.card[data-compact] {
+  min-width: 0;
+}
+
+/* Fade/scale the content, not the positioned wrapper, so following the mouse stays smooth. */
+.content {
+  display: block;
+  opacity: 0;
+  transform: scale(0.97) translateY(2px);
+  transform-origin: top left;
   transition:
     opacity var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out),
-    visibility 0s linear var(--duration-base);
+    transform var(--duration-base) var(--ease-out);
 }
 
-.card[data-align="start"] {
-  left: 0;
+.card:not([data-open]) {
+  visibility: hidden;
+  transition: visibility 0s linear var(--duration-base);
 }
 
-.card[data-align="center"] {
-  left: 50%;
-  --x: -50%;
-}
-
-.card[data-align="end"] {
-  right: 0;
-}
-
+/* While open, glide after the cursor instead of snapping. */
 .card[data-open] {
+  transition: transform 110ms var(--ease-out);
+}
+
+.card[data-open] .content {
   opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transform: translate(var(--x, 0), 0);
-  transition:
-    opacity var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out),
-    visibility 0s;
+  transform: none;
+  animation: pop-in 240ms var(--ease-out);
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(2px);
+  }
 }

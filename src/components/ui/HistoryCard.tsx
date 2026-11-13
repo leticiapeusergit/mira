@@ -11,10 +11,12 @@ export type MetricHistory = {
   series: ChartPoint[];
   target?: number;
   targetTone?: "neutral" | "error";
+  /** Y-axis in the metric's own unit. */
+  axis?: { ticks: number[]; unit: string };
 };
 
 /** Compact "value + trend + history chart" card shown inside hover popovers. */
-export function HistoryCard({ label, value, trend, series, target, targetTone }: MetricHistory) {
+export function HistoryCard({ label, value, trend, series, target, targetTone, axis }: MetricHistory) {
   return (
     <div className={styles.card}>
       <div className={styles.header}>
@@ -26,7 +28,15 @@ export function HistoryCard({ label, value, trend, series, target, targetTone }:
           {trend.text}
         </Trend>
       </div>
-      <LineChart data={series} target={target} targetTone={targetTone} size="sm" />
+      <LineChart
+        data={series}
+        target={target}
+        targetTone={targetTone}
+        ticks={axis?.ticks}
+        unit={axis?.unit}
+        size="sm"
+        restingIndex={series.length - 1}
+      />
     </div>
   );
 }

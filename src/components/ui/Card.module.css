@@ -1,6 +1,17 @@
 .card {
   background: var(--white);
   border-radius: var(--round-harder);
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  transition: outline-color var(--duration-base) var(--ease-out);
+  /* "backwards" so the entrance never pins transform after it ends. */
+  animation: soft-in var(--duration-enter) var(--ease-out) backwards;
+  animation-delay: calc(var(--stagger, 0) * 60ms);
+}
+
+/* Hover: gray border only — no movement, no shadow. */
+.card:hover {
+  outline-color: var(--ring-hover-color);
 }
 
 .padded {

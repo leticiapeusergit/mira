@@ -69,7 +69,21 @@
   display: block;
   width: 66px;
   border-radius: var(--round-soft);
+  transform-origin: bottom;
   transition: filter var(--duration-fast) var(--ease-out);
+  animation: grow-up 700ms var(--ease-out) 200ms backwards;
+}
+
+.column:nth-child(2) .bar { animation-delay: 260ms; }
+.column:nth-child(3) .bar { animation-delay: 320ms; }
+.column:nth-child(4) .bar { animation-delay: 380ms; }
+.column:nth-child(5) .bar { animation-delay: 440ms; }
+.column:nth-child(6) .bar { animation-delay: 500ms; }
+
+@keyframes grow-up {
+  from {
+    transform: scaleY(0);
+  }
 }
 
 .barHover:hover .bar,

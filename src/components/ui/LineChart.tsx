@@ -1,17 +1,30 @@
+"use client";
+
+import { useRef, useState } from "react";
 import styles from "./LineChart.module.css";
 
-export type ChartPoint = { label: string; value: number };
+/** `label` is the short x-axis text; `detail` (e.g. a full date range) shows in the tooltip. */
+export type ChartPoint = { label: string; value: number; detail?: string };
 
 type LineChartProps = {
   data: ChartPoint[];
   /** Dashed reference line (e.g. the KPI target). */
   target?: number;
-  /** Top of the y-axis. Ticks are drawn at max, 2/3, 1/3 and 0. */
+  /** Top of the y-axis (defaults to the first tick). Ticks default to max, 2/3, 1/3 and 0. */
   max?: number;
+  /** Explicit y-axis ticks, top to bottom (e.g. [100, 75, 50, 25, 0]). */
+  ticks?: number[];
+  /** Suffix for ticks and the value tooltip, e.g. "%" or "d". */
+  unit?: string;
   /** "md" for KPI cards, "sm" for the denser hover history cards. */
   size?: "sm" | "md";
   /** Colour of the target line. Defaults to gray; error is used when the target is missed. */
   targetTone?: "neutral" | "error";
+  /**
+   * Point highlighted when the pointer isn't over the chart.
+   * Charts inside hover popovers can't be hovered themselves, so they highlight the latest point.
+   */
+  restingIndex?: number;
   ariaLabel?: string;
 };
 
@@ -21,32 +34,59 @@ const VIEW_H = 40;
 export function LineChart({
   data,
   target,
-  max = 150,
+  max: maxProp,
+  ticks: ticksProp,
+  unit = "",
   size = "md",
   targetTone = "neutral",
+  restingIndex,
   ariaLabel,
 }: LineChartProps) {
-  const ticks = [max, (max * 2) / 3, max / 3, 0].map((t) => Math.round(t));
-  const step = data.length > 1 ? VIEW_W / (data.length - 1) : 0;
-  const y = (v: number) => VIEW_H - (Math.min(Math.max(v, 0), max) / max) * VIEW_H;
-  const points = data.map((d, i) => `${(i * step).toFixed(2)},${y(d.value).toFixed(2)}`).join(" ");
+  const [hovered, setHovered] = useState<number | null>(null);
+  const active = hovered ?? restingIndex ?? null;
+  /** Last shown point, kept so the marker fades out in place instead of vanishing. */
+  const lastShown = useRef<number | null>(null);
+  if (active !== null) lastShown.current = active;
+  const markerIndex = active ?? lastShown.current;
+
+  const max = maxProp ?? ticksProp?.[0] ?? 150;
+  const ticks = ticksProp ?? [max, (max * 2) / 3, max / 3, 0].map((t) => Math.round(t));
+  const last = data.length - 1;
+  const n = Math.max(data.length, 1);
+  // Points sit at the centre of each month column so they line up with the x-axis labels.
+  const xPct = (i: number) => ((i + 0.5) / n) * 100;
+  const yPct = (v: number) => 100 - (Math.min(Math.max(v, 0), max) / max) * 100;
+  const points = data
+    .map((d, i) => `${((xPct(i) / 100) * VIEW_W).toFixed(2)},${((yPct(d.value) / 100) * VIEW_H).toFixed(2)}`)
+    .join(" ");
+
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    setHovered(Math.min(n - 1, Math.max(0, Math.floor(ratio * n))));
+  };
+
+  const markerPoint = markerIndex !== null ? data[markerIndex] : null;
 
   return (
     <div className={styles.chart} data-size={size} role="img" aria-label={ariaLabel}>
       <div className={styles.yAxis} aria-hidden>
-        {ticks.map((t) => (
-          <span key={t}>{t}</span>
+        {ticks.map((t, i) => (
+          <span key={i}>
+            {t}
+            {unit}
+          </span>
         ))}
       </div>
       <div className={styles.plotColumn}>
-        <div className={styles.plot}>
+        <div className={styles.plot} onMouseMove={onMove} onMouseLeave={() => setHovered(null)}>
           <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="none" className={styles.svg}>
             {target !== undefined && (
               <line
                 x1={0}
                 x2={VIEW_W}
-                y1={y(target)}
-                y2={y(target)}
+                y1={(yPct(target) / 100) * VIEW_H}
+                y2={(yPct(target) / 100) * VIEW_H}
                 className={styles.target}
                 data-tone={targetTone}
                 vectorEffect="non-scaling-stroke"
@@ -54,10 +94,46 @@ export function LineChart({
             )}
             <polyline points={points} className={styles.line} vectorEffect="non-scaling-stroke" />
           </svg>
+
+          {/* Resting dot on every period; the last one is the selected (current) period. */}
+          {data.map((d, i) => (
+            <span
+              key={i}
+              className={styles.point}
+              data-active={i === active || undefined}
+              data-current={i === last || undefined}
+              style={{ left: `${xPct(i)}%`, top: `${yPct(d.value)}%`, ["--i" as string]: i }}
+              aria-hidden
+            />
+          ))}
+
+          {/* Dot + tooltip are HTML so they stay round and crisp while the SVG stretches. */}
+          {markerPoint && markerIndex !== null && (
+            <span
+              className={styles.marker}
+              data-visible={active !== null || undefined}
+              style={{ left: `${xPct(markerIndex)}%`, top: `${yPct(markerPoint.value)}%` }}
+              aria-hidden
+            >
+              <span className={styles.dot} />
+              <span
+                className={styles.tooltip}
+                data-edge={markerIndex === 0 ? "start" : markerIndex === last ? "end" : undefined}
+              >
+                {markerPoint.detail && <span className={styles.tooltipDetail}>{markerPoint.detail}</span>}
+                <span>
+                  {markerPoint.value}
+                  {unit}
+                </span>
+              </span>
+            </span>
+          )}
         </div>
         <div className={styles.xAxis} aria-hidden>
-          {data.map((d) => (
-            <span key={d.label}>{d.label}</span>
+          {data.map((d, i) => (
+            <span key={i} data-active={i === active || undefined} data-current={i === last || undefined}>
+              {d.label}
+            </span>
           ))}
         </div>
       </div>

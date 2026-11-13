@@ -23,7 +23,14 @@
   display: flex;
   height: 15px;
   border-radius: 4px;
-  overflow: visible;
+  transform-origin: left;
+  animation: grow-right 800ms var(--ease-out) 200ms backwards;
+}
+
+@keyframes grow-right {
+  from {
+    transform: scaleX(0);
+  }
 }
 
 /* HoverCard root becomes the flex item; its share of the bar comes from the fill's flex-grow. */

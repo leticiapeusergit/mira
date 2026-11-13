@@ -1,0 +1,47 @@
+.kpiSlot {
+  display: flex;
+  scroll-margin: 24px;
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    filter var(--duration-slow) var(--ease-out);
+}
+
+.kpiSlot > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.kpiSlot:nth-child(2) {
+  --stagger: 1;
+}
+
+.kpiSlot:nth-child(3) {
+  --stagger: 2;
+}
+
+.kpiSlot:nth-child(4) {
+  --stagger: 3;
+}
+
+/* Filtered out: soften instead of hiding, so the layout never jumps. */
+.kpiSlot[data-state="dimmed"],
+.rest[data-dimmed] {
+  opacity: 0.4;
+  filter: saturate(0.6);
+}
+
+.kpiSlot[data-state="dimmed"]:hover,
+.rest[data-dimmed]:hover {
+  opacity: 0.75;
+}
+
+/* Selected: gray border only — no movement, no shadow. */
+.kpiSlot[data-state="focused"] > article {
+  outline-color: var(--ring-selected-color);
+}
+
+.rest {
+  transition:
+    opacity var(--duration-slow) var(--ease-out),
+    filter var(--duration-slow) var(--ease-out);
+}

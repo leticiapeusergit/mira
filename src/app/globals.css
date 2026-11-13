@@ -3,11 +3,16 @@
   /* Purple (brand) */
   --purple-25: #fafaff;
   --purple-50: #f4f3ff;
+  --purple-100: #ebe9fe;
+  --purple-200: #d9d6fe;
   --purple-300: #bdb4fe;
   --purple-400: #9b8afb;
   --purple-500: #7a5af8;
   --purple-600: #6938ef;
   --purple-700: #5925dc;
+  --purple-900: #3e1c96;
+  --brand-900: #2d3282;
+  --brand-950: #1f235b;
 
   /* Brand secondary (teal) */
   --teal-25: #f2fffc;
@@ -33,6 +38,8 @@
   --gray-25: #fdfdfd;
   --gray-50: #fafafa;
   --gray-200: #e9eaeb;
+  --gray-300: #d5d7da;
+  --gray-400: #a4a7ae;
   --gray-500: #717680;
   --gray-600: #4e525b;
   --gray-800: #1d222b;
@@ -41,17 +48,24 @@
   --bluegray-50: #f8f9fc;
   --bluegray-100: #eaecf5;
   --bluegray-200: #c8cce5;
+  --bluegray-300: #9ea5d1;
   --bluegray-400: #717bbc;
+  --bluegray-500: #4e5ba6;
   --bluegray-600: #3e4784;
 
   --white: #ffffff;
   --page-bg: #f7f7fb;
   --divider: #ecf1f8;
+  --divider-strong: #dddbdb;
 
   /* Radius */
   --round-soft: 4px;
   --round-hard: 8px;
   --round-harder: 12px;
+
+  /* Card interaction: inner outline, painted above content, never shifts layout. */
+  --ring-hover-color: var(--gray-300);
+  --ring-selected-color: var(--gray-400);
 
   /* Elevation */
   --shadow-lighter: -14px 14px 30px 0 rgba(0, 0, 0, 0.1);
@@ -60,6 +74,8 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration-fast: 140ms;
   --duration-base: 200ms;
+  --duration-slow: 280ms;
+  --duration-enter: 520ms;
 
   --font-sans: var(--font-manrope), system-ui, sans-serif;
 }
@@ -106,6 +122,27 @@ img {
 :focus-visible {
   outline: 2px solid var(--purple-500);
   outline-offset: 2px;
+}
+
+/* Shared entrance: soft fade + rise. */
+@keyframes soft-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
