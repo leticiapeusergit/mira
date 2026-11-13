@@ -35,7 +35,13 @@ export function RecruiterGroupCard({ id, title, description, tone, maxAvatars, h
         <div className={styles.text}>
           <h3 className={styles.title}>{title}</h3>
           <p className={styles.description}>{description}</p>
-          <Trend direction={delta >= 0 ? "up" : "down"}>{deltaText}</Trend>
+          <Trend
+            direction={delta >= 0 ? "up" : "down"}
+            // More recruiters needing review is bad news; more meeting targets is good.
+            sentiment={(id === "needs-review" ? delta <= 0 : delta >= 0) ? "good" : "bad"}
+          >
+            {deltaText}
+          </Trend>
         </div>
 
         {/* Hover the badge for how the group size moved across periods. */}
