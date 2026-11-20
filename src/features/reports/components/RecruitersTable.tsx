@@ -6,12 +6,17 @@ import { HoverCard } from "@/components/ui/HoverCard";
 import { Tag } from "@/components/ui/Tag";
 import { columnTarget, parseMetric, RECRUITER_COLUMNS, RECRUITER_ROWS, recruiterStatusHistory, type TargetStatus } from "../data";
 import { countAxis, DAYS_AXIS, PERCENT_AXIS, periodSeries, trendFromSeries } from "../history";
-import { windowRange, type PeriodWindow } from "../period";
+import { monthSlices, windowRange } from "../period";
 import { useReportsPeriod } from "../ReportsPeriodContext";
 import styles from "./RecruitersTable.module.css";
 
-export function RecruitersTable() {
+/** `names` limits the rows (set by the group cards above); omit to show everyone. */
+export function RecruitersTable({ names }: { names?: string[] }) {
   const { windows } = useReportsPeriod();
+  const rows = names ? RECRUITER_ROWS.filter((r) => names.includes(r.name)) : RECRUITER_ROWS;
+  // History column: the selected period month by month.
+  const selected = windows[windows.length - 1];
+  const months = selected ? monthSlices(selected) : [];
 
   return (
     <Card className={styles.card}>
@@ -29,13 +34,22 @@ export function RecruitersTable() {
             ))}
             <th scope="col" className={styles.historyCol}>
               History
-              <span className={styles.target}>{windows.length} × {windows[0]?.days ?? 0}d</span>
             </th>
           </tr>
         </thead>
         <tbody>
-          {RECRUITER_ROWS.map((row, rowIndex) => (
-            <tr key={row.name}>
+          {rows.length === 0 && (
+            <tr>
+              <td colSpan={RECRUITER_COLUMNS.length + 2} className={styles.empty}>
+                No recruiters in this group for the selected period.
+              </td>
+            </tr>
+          )}
+          {rows.map((row) => {
+            // Seed from the full list so a row keeps its numbers when the table is filtered.
+            const rowIndex = RECRUITER_ROWS.indexOf(row);
+            return (
+            <tr key={row.name} className={styles.row}>
               <th scope="row" className={styles.nameCol}>
                 <span className={styles.person}>
                   <img src={row.avatar} alt="" width={32} height={32} className={styles.avatar} />
@@ -82,10 +96,11 @@ export function RecruitersTable() {
                 );
               })}
               <td className={styles.historyCol}>
-                <StatusDots name={row.name} windows={windows} />
+                <StatusDots name={row.name} months={months} />
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </Card>
@@ -98,28 +113,32 @@ const STATUS_LABEL: Record<TargetStatus, string> = {
   partial: "Some targets met",
 };
 
-/** One dot per period of the selected length (oldest → selected); the last one is the selected period. */
-function StatusDots({ name, windows }: { name: string; windows: PeriodWindow[] }) {
-  const history = recruiterStatusHistory(name).slice(-windows.length);
+/** One dot per month of the selected period (oldest → latest); the last one is the current month. */
+function StatusDots({ name, months }: { name: string; months: { start: Date; end: Date; label: string }[] }) {
+  const history = recruiterStatusHistory(name, months.length);
   return (
-    <ol className={styles.dots} aria-label={`${name}: status in the last ${history.length} periods`}>
+    <ol className={styles.dots} data-dense={history.length > 7 || undefined} aria-label={`${name}: status by month in the selected period`}>
       {history.map((status, i) => {
-        const range = windows[windows.length - history.length + i];
-        const label = `${range ? windowRange(range) : `Period ${i + 1}`}: ${STATUS_LABEL[status]}`;
+        const m = months[i];
+        const range = windowRange({ start: m.start, end: m.end, days: 0 });
         return (
           <li key={i} className={styles.dotItem}>
             <HoverCard
               compact
-              label={label}
+              label={`${range}: ${STATUS_LABEL[status]}`}
               content={
                 <span className={styles.dotTooltip}>
                   <span className={styles.dot} data-status={status} />
-                  {range ? windowRange(range) : `Period ${i + 1}`}
+                  {range}
                   <strong>{STATUS_LABEL[status]}</strong>
                 </span>
               }
             >
-              <span className={styles.dot} data-status={status} data-current={i === history.length - 1 || undefined} />
+              <span
+                className={styles.dot}
+                data-status={status}
+                data-current={i === history.length - 1 || undefined}
+              />
             </HoverCard>
           </li>
         );

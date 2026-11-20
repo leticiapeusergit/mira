@@ -52,3 +52,27 @@ export function windowLabel(w: PeriodWindow): string {
 }
 
 export const windowRange = (w: PeriodWindow) => formatRange(w.start, w.end);
+
+const monthName = new Intl.DateTimeFormat("en-US", { month: "long" });
+
+/**
+ * The calendar months a window touches, clipped to the window, oldest first.
+ * Full months read "September"; partial ones show their days, e.g. "Aug 23 – 31".
+ */
+export function monthSlices(w: PeriodWindow): { start: Date; end: Date; label: string }[] {
+  const slices: { start: Date; end: Date; label: string }[] = [];
+  let cursor = startOfDay(w.start);
+  while (cursor <= w.end) {
+    const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
+    const end = monthEnd < w.end ? monthEnd : startOfDay(w.end);
+    const full = cursor.getDate() === 1 && end.getTime() === monthEnd.getTime();
+    const label = full
+      ? monthName.format(cursor)
+      : cursor.getTime() === end.getTime()
+        ? monthDay.format(cursor)
+        : `${monthDay.format(cursor)} – ${end.getDate()}`;
+    slices.push({ start: cursor, end, label });
+    cursor = addDays(monthEnd, 1);
+  }
+  return slices;
+}

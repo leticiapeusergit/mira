@@ -194,15 +194,21 @@ export type VacancySegment = {
   history: HistorySpec;
 };
 
+/** Typical ranges per period: open 70–80, filled 12–14, cancelled 2–3. */
 export const VACANCIES: VacancySegment[] = [
-  { key: "filled", label: "Filled", color: "var(--teal-600)", history: { current: 12, previous: 6, seed: 11 } },
+  { key: "filled", label: "Filled", color: "var(--teal-600)", history: { current: 14, previous: 12, seed: 11, min: 12, max: 14 } },
   {
     key: "cancelled",
     label: "Cancelled",
     color: "var(--gray-600)",
-    history: { current: 3, previous: 2, seed: 12, lowerIsBetter: true },
+    history: { current: 2, previous: 3, seed: 12, lowerIsBetter: true, min: 2, max: 3 },
   },
-  { key: "open", label: "Open", color: "var(--purple-200)", history: { current: 45, previous: 47, seed: 13, lowerIsBetter: true } },
+  {
+    key: "open",
+    label: "Open",
+    color: "var(--purple-200)",
+    history: { current: 74, previous: 78, seed: 13, lowerIsBetter: true, min: 70, max: 80 },
+  },
 ];
 
 /* ---------- Recruiter performance ---------- */
@@ -441,12 +447,20 @@ export const FUNNEL_LEGEND = [
 /** Where a recruiter stood in one period: all targets met, flagged for review, or in between. */
 export type TargetStatus = "met" | "review" | "partial";
 
-/** Oldest → selected period, from the Meeting All Targets / Needs Review streaks. */
-export function recruiterStatusHistory(name: string): TargetStatus[] {
+/**
+ * Status for each of `count` months (oldest → latest), from the Meeting All Targets / Needs Review streaks.
+ * The streaks are aligned to the latest month; longer periods repeat the earliest known pattern (mock data).
+ */
+export function recruiterStatusHistory(name: string, count: number): TargetStatus[] {
   const streakIn = (id: RecruiterGroup["id"]) =>
     RECRUITER_GROUPS.find((g) => g.id === id)?.recruiters.find((r) => r.name === name)?.streak;
   const met = streakIn("meeting");
   const review = streakIn("needs-review");
   const length = met?.length ?? review?.length ?? 0;
-  return Array.from({ length }, (_, i) => (met?.[i] ? "met" : review?.[i] ? "review" : "partial"));
+  if (!length) return Array.from({ length: count }, () => "partial");
+  return Array.from({ length: count }, (_, i) => {
+    let k = length - count + i;
+    if (k < 0) k = ((k % length) + length) % length;
+    return met?.[k] ? "met" : review?.[k] ? "review" : "partial";
+  });
 }

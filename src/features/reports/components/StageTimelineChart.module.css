@@ -43,10 +43,14 @@
   transform: rotate(180deg);
 }
 
+/* Fills the space between header and legend and centres the bar in it. */
 .chart {
+  position: relative;
   display: flex;
+  flex: 1;
   flex-direction: column;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
   min-width: 0;
   padding: 16px;
 }
@@ -79,7 +83,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 8px;
+  border-radius: 4px;
   transition:
     opacity var(--duration-base) var(--ease-out),
     transform var(--duration-base) var(--ease-out);
@@ -137,6 +141,11 @@
   opacity: 1;
 }
 
+/* Collapsed: cancel the flex gap so the bar stays truly centred. */
+.history:not([data-open]) {
+  margin-top: -6px;
+}
+
 .rows {
   display: flex;
   flex-direction: column;
@@ -148,8 +157,14 @@
   list-style: none;
 }
 
+/* Expanded: 20px above the main bar and 20px between its axis and the first month (6px gap + 14px). */
+.chart[data-open] {
+  padding-top: 20px;
+  transition: padding var(--duration-slow) var(--ease-out);
+}
+
 .history[data-open] .rows {
-  padding-top: 8px;
+  padding-top: 14px;
 }
 
 .row {
@@ -165,24 +180,7 @@
   color: var(--gray-600);
 }
 
-.rowLabel[data-current] {
-  max-height: 14px;
-  margin-bottom: -4px;
-  overflow: hidden;
-  font-weight: 700;
-  color: var(--purple-600);
-  transition:
-    max-height var(--duration-slow) var(--ease-out),
-    margin var(--duration-slow) var(--ease-out),
-    opacity var(--duration-slow) var(--ease-out);
-}
 
-/* Collapsed: no label above the selected bar, as in the design. */
-.rowLabel[data-hidden] {
-  max-height: 0;
-  margin-bottom: -8px;
-  opacity: 0;
-}
 
 .legend {
   display: flex;
@@ -253,4 +251,79 @@
 /* Secondary text on black: light enough to read (gray-300 ≈ 12:1 contrast). */
 .tooltipShare {
   color: var(--gray-300);
+}
+
+.rowsAxis {
+  padding-top: 2px;
+}
+
+/* Expanded: the scale lives under the monthly bars, so the top one goes away. */
+.chart[data-open] .axis[data-top] {
+  display: none;
+}
+
+/* Vertical guides across the bars (behind them), only while expanded. */
+.grid {
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  bottom: 30px;
+  left: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+.chart[data-open] .grid {
+  opacity: 1;
+}
+
+.grid > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--gray-200);
+  transform: translateX(-0.5px);
+}
+
+.track,
+.rowLabel {
+  position: relative;
+}
+
+/* Days printed above every bar of the hovered stage. */
+.fill {
+  position: relative;
+}
+
+.days {
+  position: absolute;
+  bottom: calc(100% + 3px);
+  left: 50%;
+  z-index: 2;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: var(--white);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--gray-800);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 2px);
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+
+.track[data-size="sm"] .days {
+  font-size: 9px;
+}
+
+.days[data-visible] {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }

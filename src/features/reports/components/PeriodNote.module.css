@@ -1,0 +1,13 @@
+.note {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--gray-400);
+  white-space: nowrap;
+}
+
+/* Narrow cards: own line under the title, no leading gap. */
+.note[data-block] {
+  display: block;
+  margin: 4px 0 0;
+}

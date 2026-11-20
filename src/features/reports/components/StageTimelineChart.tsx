@@ -4,15 +4,16 @@ import { useId, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { HoverCard } from "@/components/ui/HoverCard";
 import { TIMELINE_MAX_DAYS, type StageTimeline, type TimelineStage } from "../data";
-import { windowRange } from "../period";
+import { monthSlices, windowRange } from "../period";
 import { useReportsPeriod } from "../ReportsPeriodContext";
+import { PeriodNote } from "./PeriodNote";
 import styles from "./StageTimelineChart.module.css";
 
 const AXIS_TICKS = [0, 5, 10, 15, 20, 25, 30];
 
-/** Mock days per stage for older periods; the selected period always uses `current`. */
-function pastDays(current: number[], seed: number, periodIndex: number): number[] {
-  const days = current.map((d, k) => Math.max(0.5, d * (1 + 0.3 * Math.sin(seed * 1.3 + periodIndex * 2.1 + k * 0.7))));
+/** Mock days per stage for one month of the selected period, varying around the period's `current` values. */
+function monthDays(current: number[], seed: number, monthIndex: number): number[] {
+  const days = current.map((d, k) => Math.max(0.5, d * (1 + 0.3 * Math.sin(seed * 1.3 + monthIndex * 2.1 + k * 0.7))));
   const total = days.reduce((a, b) => a + b, 0);
   const fit = total > TIMELINE_MAX_DAYS - 0.5 ? (TIMELINE_MAX_DAYS - 0.5) / total : 1;
   return days.map((d) => Math.round(d * fit * 10) / 10);
@@ -22,7 +23,7 @@ const fmt = (d: number) => (Number.isInteger(d) ? `${d}` : d.toFixed(1));
 
 /**
  * One stacked bar: business days per stage in the selected period.
- * The chevron expands the same breakdown for the periods before it.
+ * The chevron expands the same breakdown month by month within that period.
  */
 export function StageTimelineChart({ title, stages, current, seed }: StageTimeline) {
   const [open, setOpen] = useState(false);
@@ -30,8 +31,10 @@ export function StageTimelineChart({ title, stages, current, seed }: StageTimeli
   const [activeStage, setActiveStage] = useState<string | null>(null);
   const historyId = useId();
   const { windows } = useReportsPeriod();
-  const selectedRange = windows.length ? windowRange(windows[windows.length - 1]) : "Selected period";
-  const past = windows.slice(0, -1).map((w, i) => ({ window: w, days: pastDays(current, seed, i) })).reverse();
+  const selected = windows[windows.length - 1];
+  const selectedRange = selected ? windowRange(selected) : "Selected period";
+  // Month-by-month breakdown of the selected period, oldest first.
+  const months = selected ? monthSlices(selected).map((m, i) => ({ ...m, days: monthDays(current, seed, i) })) : [];
 
   const bar = (days: number[], periodLabel: string, size: "lg" | "sm") => (
     <div className={styles.track} data-size={size}>
@@ -46,6 +49,7 @@ export function StageTimelineChart({ title, stages, current, seed }: StageTimeli
             prev={i > 0 ? days[i - 1] : undefined}
             periodLabel={periodLabel}
             dim={!!activeStage && activeStage !== stage.key}
+            focused={activeStage === stage.key}
             onHover={setActiveStage}
           />
         );
@@ -53,51 +57,62 @@ export function StageTimelineChart({ title, stages, current, seed }: StageTimeli
     </div>
   );
 
+  const axis = (top = false) => (
+    <div className={styles.axis} data-top={top || undefined} aria-hidden>
+      {AXIS_TICKS.map((t) => (
+        <span
+          key={t}
+          style={{ left: `${(t / TIMELINE_MAX_DAYS) * 100}%` }}
+          data-edge={t === 0 ? "start" : t === TIMELINE_MAX_DAYS ? "end" : undefined}
+        >
+          {t} BD
+        </span>
+      ))}
+    </div>
+  );
+
   return (
     <Card as="article" padded={false} className={styles.card}>
       <div className={styles.header}>
-        <h3 className={styles.title}>{title}</h3>
+        <h3 className={styles.title}>
+          {title}
+          <PeriodNote />
+        </h3>
         <button
           type="button"
           className={styles.toggle}
           data-open={open || undefined}
           aria-expanded={open}
           aria-controls={historyId}
-          aria-label={open ? `Hide previous periods for ${title}` : `Show previous periods for ${title}`}
+          aria-label={open ? `Hide monthly breakdown for ${title}` : `Show monthly breakdown for ${title}`}
           onClick={() => setOpen((o) => !o)}
         >
           <img src="/assets/icons/expand-chevron.svg" alt="" width={16} height={16} />
         </button>
       </div>
 
-      <div className={styles.chart}>
-        {/* Only labelled when expanded, so it reads as one row among the periods below. */}
-        <span className={styles.rowLabel} data-current data-hidden={!open || undefined}>
-          {selectedRange} · Selected period
-        </span>
-        {bar(current, selectedRange, "lg")}
-
-        <div className={styles.axis} aria-hidden>
+      <div className={styles.chart} data-open={open || undefined}>
+        {/* Faint vertical guides at every 5 BD, shown with the monthly breakdown. */}
+        <div className={styles.grid} aria-hidden>
           {AXIS_TICKS.map((t) => (
-            <span
-              key={t}
-              style={{ left: `${(t / TIMELINE_MAX_DAYS) * 100}%` }}
-              data-edge={t === 0 ? "start" : t === TIMELINE_MAX_DAYS ? "end" : undefined}
-            >
-              {t} BD
-            </span>
+            <span key={t} style={{ left: `${(t / TIMELINE_MAX_DAYS) * 100}%` }} />
           ))}
         </div>
+        {bar(current, selectedRange, "lg")}
 
-        {/* Previous periods of the same length as the selected one, newest first. Height animates via grid rows. */}
+        {axis(true)}
+
+        {/* The selected period month by month. Height animates via grid rows. */}
         <div id={historyId} className={styles.history} data-open={open || undefined}>
           <ul className={styles.rows}>
-            {past.map(({ window, days }, i) => (
+            {months.map(({ start, end, label, days }, i) => (
               <li key={i} className={styles.row} style={{ ["--row" as string]: i }}>
-                <span className={styles.rowLabel}>{windowRange(window)}</span>
-                {bar(days, windowRange(window), "sm")}
+                <span className={styles.rowLabel}>{label}</span>
+                {bar(days, `${windowRange({ start, end, days: 0 })}`, "sm")}
               </li>
             ))}
+            {/* Same scale under the monthly bars so they can be read without looking back up. */}
+            <li className={styles.rowsAxis}>{axis()}</li>
           </ul>
         </div>
       </div>
@@ -125,6 +140,7 @@ function Segment({
   prev,
   periodLabel,
   dim,
+  focused,
   onHover,
 }: {
   stage: TimelineStage;
@@ -132,6 +148,8 @@ function Segment({
   prev?: number;
   periodLabel: string;
   dim: boolean;
+  /** This stage is hovered somewhere: print its days on every bar. */
+  focused: boolean;
   onHover: (key: string | null) => void;
 }) {
   const name = stage.label.replace("\n", " ");
@@ -164,7 +182,11 @@ function Segment({
         data-dim={dim || undefined}
         onMouseEnter={() => onHover(stage.key)}
         onMouseLeave={() => onHover(null)}
-      />
+      >
+        <span className={styles.days} data-visible={focused || undefined}>
+          {fmt(days)}
+        </span>
+      </span>
     </HoverCard>
   );
 }

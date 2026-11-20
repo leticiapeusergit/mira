@@ -1,6 +1,69 @@
+/* Card surface as a button: hover and selected are a gray border only — no movement, no shadow. */
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--round-harder);
+  background: var(--white);
+  text-align: left;
+  cursor: pointer;
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  transition:
+    outline-color var(--duration-base) var(--ease-out),
+    opacity var(--duration-slow) var(--ease-out),
+    filter var(--duration-slow) var(--ease-out);
+  animation: soft-in var(--duration-enter) var(--ease-out) backwards;
+  animation-delay: calc(var(--stagger, 0) * 60ms);
+}
+
+.card:hover {
+  outline-color: var(--ring-hover-color);
+}
+
+.card[aria-pressed="true"] {
+  outline-color: var(--ring-selected-color);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--purple-500);
+  outline-offset: 2px;
+}
+
+.card:active {
+  background: var(--gray-25);
+}
+
+.card[data-dimmed] {
+  opacity: 0.5;
+  filter: saturate(0.6);
+}
+
+.card[data-dimmed]:hover {
+  opacity: 0.8;
+}
+
+/* "Clear" hint on the selected card, pinned to the corner so nothing reflows. */
+.clear {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--gray-500);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+
+.card[aria-pressed="true"] .clear {
+  opacity: 1;
+  transform: none;
 }
 
 .summary {

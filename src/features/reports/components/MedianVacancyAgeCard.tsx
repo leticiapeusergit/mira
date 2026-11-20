@@ -7,6 +7,7 @@ import { Trend } from "@/components/ui/Trend";
 import { MEDIAN_VACANCY_AGE } from "../data";
 import { periodSeries, trendFromSeries } from "../history";
 import { useReportsPeriod } from "../ReportsPeriodContext";
+import { PeriodNote } from "./PeriodNote";
 import styles from "./MedianVacancyAgeCard.module.css";
 
 export function MedianVacancyAgeCard() {
@@ -17,7 +18,10 @@ export function MedianVacancyAgeCard() {
 
   return (
     <Card as="article" className={styles.card}>
-      <h3 className={styles.title}>Median Vacancy Age</h3>
+      <h3 className={styles.title}>
+        Median Vacancy Age
+        <PeriodNote block />
+      </h3>
       <HoverCard
         className={styles.hover}
         label={`Median vacancy age: ${current} days`}
@@ -35,10 +39,10 @@ export function MedianVacancyAgeCard() {
           <span className={styles.unit}>Days</span>
         </span>
       </HoverCard>
-      {/* Fewer days open is good news. */}
+      {/* Selected period vs the equally long period before it; fewer days open is good news. */}
       <Trend direction={delta <= 0 ? "up" : "down"}>
         {delta > 0 ? "+" : ""}
-        {delta} Days than prev
+        {delta} days vs previous period
       </Trend>
     </Card>
   );

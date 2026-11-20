@@ -22,9 +22,9 @@
 .chart {
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-rows: 112px auto;
+  grid-template-rows: 150px auto;
   gap: 6px 16px;
-  padding-top: 30px;
+  padding-top: 18px;
 }
 
 .yAxis {
@@ -50,11 +50,12 @@
   gap: 24px;
 }
 
+/* One column per month; together they fill the chart's width. */
 .column {
   display: flex;
+  flex: 1 1 0;
   align-items: flex-end;
   align-self: stretch;
-  width: 130px;
   min-width: 0;
 }
 
@@ -74,40 +75,24 @@
   }
 }
 
-/* Column total in a black bubble with a pointer. */
+/* Column total printed on top, like the hiring funnel values. */
 .total {
   position: absolute;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 6px);
   left: 50%;
-  z-index: 1;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: #000;
   font-size: 12px;
-  font-weight: 700;
-  line-height: 1.3;
-  color: var(--white);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--gray-800);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
   transform: translateX(-50%);
-}
-
-.total::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  width: 7px;
-  height: 7px;
-  background: inherit;
-  border-radius: 1px;
-  transform: translate(-50%, -4px) rotate(45deg);
 }
 
 /* HoverCard root: share of the column comes from flex-grow (the value). */
 .segment {
   flex-basis: 0;
-  min-height: 2px;
+  /* Small shares (e.g. 2 cancelled) stay big enough to see and hover. */
+  min-height: 8px;
 }
 
 .fill {
@@ -116,7 +101,9 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  transition: filter var(--duration-fast) var(--ease-out);
+  transition:
+    filter var(--duration-fast) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
 }
 
 .segment:last-child .fill {
@@ -127,9 +114,28 @@
   filter: brightness(0.94);
 }
 
-.column:hover .segmentValue,
-.column:focus-within .segmentValue {
+/* Focused series (legend or segment hover): its numbers show in every column. */
+.fill[data-focus] .segmentValue {
   opacity: 1;
+}
+
+.fill {
+  position: relative;
+}
+
+.fill[data-dim] {
+  opacity: 0.35;
+}
+
+.segmentValue[data-outside] {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 6px);
+  transform: translateY(-50%);
+}
+
+.fill[data-key="cancelled"] .segmentValue[data-outside] {
+  color: var(--gray-800);
 }
 
 /* Segment numbers appear on hover only; the column total stays visible. */
@@ -159,7 +165,8 @@
 }
 
 .xAxis > span {
-  width: 130px;
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .xAxis > span[data-current] {

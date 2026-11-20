@@ -81,6 +81,7 @@
 
 .historyCol {
   width: 120px;
+  white-space: nowrap;
 }
 
 /* Status per period: teal = all targets met, red = needs review, gray = in between. */
@@ -95,6 +96,16 @@
 
 .dotItem {
   display: flex;
+}
+
+/* Long periods (e.g. a year = 13 months): smaller, tighter dots. */
+.dots[data-dense] {
+  gap: 3px;
+}
+
+.dots[data-dense] .dot {
+  width: 7px;
+  height: 7px;
 }
 
 .dot {
@@ -144,4 +155,16 @@
 .dotTooltip .dot {
   width: 8px;
   height: 8px;
+}
+
+/* Rows fade in when the group filter changes. */
+.row {
+  animation: soft-fade var(--duration-base) var(--ease-out) backwards;
+}
+
+.empty {
+  padding: 24px 0 !important;
+  font-size: 13px;
+  color: var(--gray-500);
+  text-align: center !important;
 }

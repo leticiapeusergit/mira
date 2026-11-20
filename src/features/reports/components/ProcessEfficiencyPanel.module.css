@@ -16,14 +16,19 @@
   color: var(--gray-800);
 }
 
+/*
+ * Cards share a minimum height so collapsed rows line up; they don't stretch,
+ * so expanding a process timeline doesn't grow the task chart beside it.
+ */
 .charts {
   display: flex;
-  align-items: stretch;
+  align-items: flex-start;
   gap: 16px;
 }
 
 .charts > * {
   flex: 1 1 0;
   min-width: 0;
+  min-height: 228px;
 }
 

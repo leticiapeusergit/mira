@@ -24,6 +24,16 @@
   line-height: 1;
   color: var(--gray-500);
   text-align: right;
+  position: relative;
+}
+
+.unitLabel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 5px);
+  font-weight: 600;
+  color: var(--gray-400);
+  white-space: nowrap;
 }
 
 .plotColumn {
@@ -234,9 +244,9 @@
 .pointValue {
   position: absolute;
   font-size: 9px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
-  color: var(--gray-600);
+  color: var(--gray-400);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   pointer-events: none;
@@ -255,6 +265,6 @@
 }
 
 .pointValue[data-current] {
-  font-weight: 800;
-  color: var(--purple-700);
+  font-weight: 700;
+  color: var(--purple-500);
 }

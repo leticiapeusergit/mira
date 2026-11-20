@@ -22,3 +22,23 @@
   height: 7px;
   border-radius: 4px;
 }
+
+.item[data-interactive] {
+  margin: -4px -6px;
+  padding: 4px 6px;
+  border-radius: var(--round-soft);
+  cursor: default;
+  outline: none;
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.item[data-interactive]:hover,
+.item[data-interactive]:focus-visible {
+  background: var(--purple-50);
+}
+
+.item[data-dim] {
+  opacity: 0.4;
+}

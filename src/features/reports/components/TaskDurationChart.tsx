@@ -6,6 +6,7 @@ import { HoverCard } from "@/components/ui/HoverCard";
 import { TASK_AXIS, type TaskDurationChart as TaskDurationChartProps } from "../data";
 import { periodSeries, trendFromSeries } from "../history";
 import { useReportsPeriod } from "../ReportsPeriodContext";
+import { PeriodNote } from "./PeriodNote";
 import styles from "./TaskDurationChart.module.css";
 
 const AXIS_MAX = TASK_AXIS[0];
@@ -16,7 +17,10 @@ export function TaskDurationChart({ title, tasks }: TaskDurationChartProps) {
 
   return (
     <Card as="article" className={styles.card}>
-      <h3 className={styles.title}>{title}</h3>
+      <h3 className={styles.title}>
+        {title}
+        <PeriodNote />
+      </h3>
 
       <div className={styles.chart}>
         <div className={styles.yAxis} aria-hidden>

@@ -1,10 +1,8 @@
 import { TeamPerformanceSection } from "./components/TeamPerformanceSection";
-import { RecruiterGroupCard } from "./components/RecruiterGroupCard";
-import { RecruitersTable } from "./components/RecruitersTable";
+import { RecruiterPerformance } from "./components/RecruiterPerformance";
 import { ProcessEfficiencyPanel } from "./components/ProcessEfficiencyPanel";
 import { RealTimeStats } from "./components/RealTimeStats";
 import { TeamFilters } from "./components/TeamFilters";
-import { RECRUITER_GROUPS } from "./data";
 import { ReportsPeriodProvider } from "./ReportsPeriodContext";
 import styles from "./ReportsPage.module.css";
 
@@ -38,14 +36,7 @@ export function ReportsPage() {
 
             <TeamPerformanceSection />
 
-            <div className={styles.group}>
-              <div className={`${styles.row} ${styles.alignStart}`}>
-                {RECRUITER_GROUPS.map((group) => (
-                  <RecruiterGroupCard key={group.id} {...group} />
-                ))}
-              </div>
-              <RecruitersTable />
-            </div>
+            <RecruiterPerformance />
           </div>
         </section>
       </div>

@@ -37,6 +37,8 @@ function isValley(data: ChartPoint[], i: number): boolean {
   return data[i].value < neighbours.reduce((a, b) => a + b, 0) / neighbours.length;
 }
 
+const UNIT_LABEL: Record<string, string> = { "%": "%", d: "Days" };
+
 const VIEW_W = 100;
 const VIEW_H = 40;
 
@@ -80,12 +82,11 @@ export function LineChart({
 
   return (
     <div className={styles.chart} data-size={size} role="img" aria-label={ariaLabel}>
+      {/* The unit is named once above the axis instead of on every tick. */}
       <div className={styles.yAxis} aria-hidden>
+        {unit && <span className={styles.unitLabel}>{UNIT_LABEL[unit] ?? unit}</span>}
         {ticks.map((t, i) => (
-          <span key={i}>
-            {t}
-            {unit}
-          </span>
+          <span key={i}>{t}</span>
         ))}
       </div>
       <div className={styles.plotColumn}>

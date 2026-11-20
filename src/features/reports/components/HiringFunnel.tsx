@@ -7,6 +7,7 @@ import { Legend } from "@/components/ui/Legend";
 import { FUNNEL, FUNNEL_LEGEND, FUNNEL_MAX, FUNNEL_TICKS } from "../data";
 import { countAxis, periodSeries, trendFromSeries } from "../history";
 import { useReportsPeriod } from "../ReportsPeriodContext";
+import { PeriodNote } from "./PeriodNote";
 import styles from "./HiringFunnel.module.css";
 
 /** Bars and ticks share one scale so 200 sits exactly on the 200 tick. */
@@ -18,7 +19,10 @@ export function HiringFunnel() {
   return (
     <Card as="article" className={styles.card}>
       <div className={styles.header}>
-        <h3 className={styles.title}>Hiring Funnel</h3>
+        <h3 className={styles.title}>
+          Hiring Funnel
+          <PeriodNote />
+        </h3>
         <Legend items={FUNNEL_LEGEND} />
       </div>
 
