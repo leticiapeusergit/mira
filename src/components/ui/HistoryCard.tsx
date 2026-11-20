@@ -35,7 +35,7 @@ export function HistoryCard({ label, value, trend, series, target, targetTone, a
         ticks={axis?.ticks}
         unit={axis?.unit}
         size="sm"
-        restingIndex={series.length - 1}
+        showValues
       />
     </div>
   );

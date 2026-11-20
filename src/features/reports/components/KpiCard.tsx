@@ -34,6 +34,7 @@ export function KpiCard({ title, target, unit, unitPlacement, tone, trend, histo
         ticks={chartAxis.ticks}
         unit={chartAxis.unit}
         targetTone={tone === "error" ? "error" : "neutral"}
+        showValues
         ariaLabel={`${title.replace("\n", " ")} by period`}
       />
     </Card>

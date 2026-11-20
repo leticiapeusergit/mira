@@ -78,3 +78,70 @@
   transform: translateY(-1px);
   filter: brightness(0.97);
 }
+
+.historyCol {
+  width: 120px;
+}
+
+/* Status per period: teal = all targets met, red = needs review, gray = in between. */
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dotItem {
+  display: flex;
+}
+
+.dot {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--gray-200);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.dot[data-status="met"] {
+  background: var(--teal-600);
+}
+
+.dot[data-status="review"] {
+  background: var(--error-500);
+}
+
+.dot[data-current] {
+  box-shadow: 0 0 0 2px var(--white), 0 0 0 3px var(--gray-400);
+}
+
+.dotItem:hover .dot {
+  transform: scale(1.25);
+}
+
+.dotTooltip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--round-soft);
+  background: #000;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--gray-300);
+  white-space: nowrap;
+}
+
+.dotTooltip strong {
+  font-weight: 700;
+  color: var(--white);
+}
+
+.dotTooltip .dot {
+  width: 8px;
+  height: 8px;
+}

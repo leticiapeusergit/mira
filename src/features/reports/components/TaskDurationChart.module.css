@@ -1,0 +1,134 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 16px;
+}
+
+.title {
+  padding-bottom: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+}
+
+/* y-axis | columns, then x labels under the columns. */
+.chart {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 140px auto;
+  gap: 8px;
+}
+
+/* Top padding leaves room for the value printed on a full-height column. */
+/* Headroom for the value bubble on a full-height column; margin on the axis so its % scale matches the bars. */
+.columns {
+  padding-top: 30px;
+}
+
+.yAxis {
+  margin-top: 30px;
+}
+
+.yAxis {
+  position: relative;
+  width: 14px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--gray-500);
+  text-align: right;
+  background-clip: content-box;
+}
+
+.yAxis > span {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+}
+
+.columns {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* HoverCard root: one per column, full height so the hover target is generous. */
+.column {
+  display: flex;
+  flex: 1 1 0;
+  align-items: flex-end;
+  align-self: stretch;
+  min-width: 0;
+}
+
+.bar {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 2px;
+  border-radius: var(--round-soft);
+  transform-origin: bottom;
+  transition: filter var(--duration-fast) var(--ease-out);
+  animation: grow-up 700ms var(--ease-out) backwards;
+  animation-delay: calc(200ms + var(--i, 0) * 60ms);
+}
+
+@keyframes grow-up {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+.column:hover .bar,
+.column:focus-within .bar {
+  filter: brightness(0.95) saturate(1.1);
+}
+
+/* Value bubble with a pointer, sitting on top of each column. */
+.value {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--purple-700);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--white);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  animation: soft-fade var(--duration-enter) var(--ease-out) backwards;
+  animation-delay: calc(500ms + var(--i, 0) * 60ms);
+}
+
+.value::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  background: inherit;
+  border-radius: 1px;
+  transform: translate(-50%, -4px) rotate(45deg);
+}
+
+.xAxis {
+  display: flex;
+  grid-column: 2;
+  gap: 24px;
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--gray-600);
+  white-space: pre-line;
+}
+
+.xAxis > span {
+  flex: 1 1 0;
+  min-width: 0;
+}

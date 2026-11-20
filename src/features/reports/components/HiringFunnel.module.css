@@ -1,6 +1,5 @@
 .card {
   display: flex;
-  flex: 1 1 0;
   flex-direction: column;
   gap: 22px;
   min-width: 0;
@@ -19,66 +18,78 @@
   color: var(--gray-800);
 }
 
+/* y-axis | bars over x labels. */
 .chart {
-  display: flex;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 8px;
 }
 
 .yAxis {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 19px;
-  width: 55px;
-  padding-bottom: 30px;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 8px;
+  padding-bottom: 36px;
   font-size: 10px;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.2;
   color: var(--gray-500);
   text-align: right;
 }
 
+.yTitle {
+  text-align: left;
+}
+
+.ticks {
+  position: relative;
+}
+
+.ticks > span {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+}
+
 .plot {
   display: flex;
-  flex: 1;
   flex-direction: column;
+  gap: 12px;
   min-width: 0;
+  padding-top: 20px;
 }
 
 .bars {
   display: flex;
-  flex: 1;
   align-items: flex-end;
-  gap: 4px;
-  padding-bottom: 12px;
+  gap: 36px;
+  height: 153px;
 }
 
 .column {
   display: flex;
-  flex: 1;
-  justify-content: center;
+  flex: 1 1 0;
+  align-self: stretch;
   min-width: 0;
 }
 
+/* HoverCard root spans the column so hovering anywhere above the bar works. */
 .barHover {
+  display: flex;
+  flex: 1;
   align-items: flex-end;
 }
 
 .bar {
   position: relative;
   display: block;
-  width: 66px;
+  width: 100%;
   border-radius: var(--round-soft);
   transform-origin: bottom;
   transition: filter var(--duration-fast) var(--ease-out);
-  animation: grow-up 700ms var(--ease-out) 200ms backwards;
+  animation: grow-up 700ms var(--ease-out) backwards;
+  animation-delay: calc(200ms + var(--i, 0) * 60ms);
 }
-
-.column:nth-child(2) .bar { animation-delay: 260ms; }
-.column:nth-child(3) .bar { animation-delay: 320ms; }
-.column:nth-child(4) .bar { animation-delay: 380ms; }
-.column:nth-child(5) .bar { animation-delay: 440ms; }
-.column:nth-child(6) .bar { animation-delay: 500ms; }
 
 @keyframes grow-up {
   from {
@@ -88,59 +99,37 @@
 
 .barHover:hover .bar,
 .barHover:focus-within .bar {
-  filter: brightness(0.96) saturate(1.1);
+  filter: brightness(0.95) saturate(1.1);
 }
 
-/* Dark value bubble above the hovered bar. */
-.tooltip {
+/* Value printed on top of each column. */
+.value {
   position: absolute;
-  bottom: calc(100% + 10px);
+  bottom: calc(100% + 6px);
   left: 50%;
-  padding: 8px 12px;
-  border-radius: var(--round-soft);
-  background: var(--gray-600);
   font-size: 12px;
-  font-weight: 500;
-  line-height: 1.4;
-  color: var(--white);
-  white-space: nowrap;
-  opacity: 0;
-  transform: translate(-50%, 4px);
-  pointer-events: none;
-  transition:
-    opacity var(--duration-base) var(--ease-out),
-    transform var(--duration-base) var(--ease-out);
-}
-
-.tooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  width: 10px;
-  height: 10px;
-  background: inherit;
-  transform: translate(-50%, -6px) rotate(45deg);
-}
-
-.barHover:hover .tooltip,
-.barHover:focus-within .tooltip {
-  opacity: 1;
-  transform: translate(-50%, 0);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--gray-800);
+  font-variant-numeric: tabular-nums;
+  transform: translateX(-50%);
+  animation: soft-fade var(--duration-enter) var(--ease-out) backwards;
+  animation-delay: calc(500ms + var(--i, 0) * 60ms);
 }
 
 .xAxis {
   display: flex;
-  gap: 4px;
+  gap: 36px;
+  min-height: 24px;
   font-size: 10px;
   font-weight: 500;
   line-height: 1.2;
-  color: var(--gray-500);
+  color: var(--gray-600);
   text-align: center;
   white-space: pre-line;
 }
 
 .xAxis > span {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
 }

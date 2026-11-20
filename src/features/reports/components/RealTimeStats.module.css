@@ -1,0 +1,45 @@
+.stats {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stat {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: var(--round-harder);
+  background: var(--purple-100);
+  animation: soft-in var(--duration-enter) var(--ease-out) backwards;
+  animation-delay: calc(var(--stagger, 0) * 60ms);
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gray-800);
+}
+
+.valueBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  padding: 8px 4px;
+  border-radius: var(--round-hard);
+  background: var(--purple-25);
+}
+
+.value {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--purple-600);
+  font-variant-numeric: tabular-nums;
+}

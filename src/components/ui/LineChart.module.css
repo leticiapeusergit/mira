@@ -42,6 +42,10 @@
   cursor: crosshair;
 }
 
+.plot[data-static] {
+  cursor: default;
+}
+
 .svg {
   display: block;
   width: 100%;
@@ -224,4 +228,33 @@
 
 .xAxis > span[data-active] {
   color: var(--gray-800);
+}
+
+/* Value printed above each point (history cards). */
+.pointValue {
+  position: absolute;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--gray-600);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 6px));
+  /* Halo in the plot colour keeps numbers readable over the line or target. */
+  text-shadow:
+    0 0 2px var(--purple-50),
+    0 0 2px var(--purple-50),
+    0 0 3px var(--purple-50);
+  animation: soft-fade var(--duration-enter) var(--ease-out) backwards;
+  animation-delay: calc(200ms + var(--i, 0) * 40ms);
+}
+
+.pointValue[data-place="below"] {
+  transform: translate(-50%, 6px);
+}
+
+.pointValue[data-current] {
+  font-weight: 800;
+  color: var(--purple-700);
 }

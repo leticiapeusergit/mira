@@ -4,8 +4,9 @@ import { Card } from "@/components/ui/Card";
 import { HistoryCard } from "@/components/ui/HistoryCard";
 import { HoverCard } from "@/components/ui/HoverCard";
 import { Tag } from "@/components/ui/Tag";
-import { columnTarget, parseMetric, RECRUITER_COLUMNS, RECRUITER_ROWS } from "../data";
+import { columnTarget, parseMetric, RECRUITER_COLUMNS, RECRUITER_ROWS, recruiterStatusHistory, type TargetStatus } from "../data";
 import { countAxis, DAYS_AXIS, PERCENT_AXIS, periodSeries, trendFromSeries } from "../history";
+import { windowRange, type PeriodWindow } from "../period";
 import { useReportsPeriod } from "../ReportsPeriodContext";
 import styles from "./RecruitersTable.module.css";
 
@@ -26,6 +27,10 @@ export function RecruitersTable() {
                 {col.target && <span className={styles.target}>{col.target}</span>}
               </th>
             ))}
+            <th scope="col" className={styles.historyCol}>
+              History
+              <span className={styles.target}>{windows.length} × {windows[0]?.days ?? 0}d</span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -76,10 +81,49 @@ export function RecruitersTable() {
                   </td>
                 );
               })}
+              <td className={styles.historyCol}>
+                <StatusDots name={row.name} windows={windows} />
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
     </Card>
+  );
+}
+
+const STATUS_LABEL: Record<TargetStatus, string> = {
+  met: "Met all targets",
+  review: "Needs review",
+  partial: "Some targets met",
+};
+
+/** One dot per period of the selected length (oldest → selected); the last one is the selected period. */
+function StatusDots({ name, windows }: { name: string; windows: PeriodWindow[] }) {
+  const history = recruiterStatusHistory(name).slice(-windows.length);
+  return (
+    <ol className={styles.dots} aria-label={`${name}: status in the last ${history.length} periods`}>
+      {history.map((status, i) => {
+        const range = windows[windows.length - history.length + i];
+        const label = `${range ? windowRange(range) : `Period ${i + 1}`}: ${STATUS_LABEL[status]}`;
+        return (
+          <li key={i} className={styles.dotItem}>
+            <HoverCard
+              compact
+              label={label}
+              content={
+                <span className={styles.dotTooltip}>
+                  <span className={styles.dot} data-status={status} />
+                  {range ? windowRange(range) : `Period ${i + 1}`}
+                  <strong>{STATUS_LABEL[status]}</strong>
+                </span>
+              }
+            >
+              <span className={styles.dot} data-status={status} data-current={i === history.length - 1 || undefined} />
+            </HoverCard>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

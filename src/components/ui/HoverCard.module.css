@@ -21,7 +21,7 @@
   z-index: 50;
   display: block;
   width: max-content;
-  min-width: 262px;
+  min-width: 302px;
   pointer-events: none;
   will-change: transform;
 }

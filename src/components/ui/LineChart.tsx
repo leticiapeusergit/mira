@@ -25,8 +25,17 @@ type LineChartProps = {
    * Charts inside hover popovers can't be hovered themselves, so they highlight the latest point.
    */
   restingIndex?: number;
+  /** Print each point's value above it; replaces the hover marker and tooltip. */
+  showValues?: boolean;
   ariaLabel?: string;
 };
+
+/** A point lower than the average of its neighbours; its value label goes under it. */
+function isValley(data: ChartPoint[], i: number): boolean {
+  const neighbours = [data[i - 1], data[i + 1]].filter(Boolean).map((p) => p.value);
+  if (!neighbours.length) return false;
+  return data[i].value < neighbours.reduce((a, b) => a + b, 0) / neighbours.length;
+}
 
 const VIEW_W = 100;
 const VIEW_H = 40;
@@ -40,6 +49,7 @@ export function LineChart({
   size = "md",
   targetTone = "neutral",
   restingIndex,
+  showValues = false,
   ariaLabel,
 }: LineChartProps) {
   const [hovered, setHovered] = useState<number | null>(null);
@@ -79,7 +89,12 @@ export function LineChart({
         ))}
       </div>
       <div className={styles.plotColumn}>
-        <div className={styles.plot} onMouseMove={onMove} onMouseLeave={() => setHovered(null)}>
+        <div
+          className={styles.plot}
+          data-static={showValues || undefined}
+          onMouseMove={showValues ? undefined : onMove}
+          onMouseLeave={showValues ? undefined : () => setHovered(null)}
+        >
           <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="none" className={styles.svg}>
             {target !== undefined && (
               <line
@@ -107,8 +122,24 @@ export function LineChart({
             />
           ))}
 
+          {showValues &&
+            data.map((d, i) => (
+              <span
+                key={`v${i}`}
+                className={styles.pointValue}
+                data-current={i === last || undefined}
+                // Above peaks, below valleys, so the number never sits on the line.
+                data-place={isValley(data, i) ? "below" : undefined}
+                style={{ left: `${xPct(i)}%`, top: `${yPct(d.value)}%`, ["--i" as string]: i }}
+                aria-hidden
+              >
+                {/* The unit is already on the y-axis; repeating it on every point is noise. */}
+                {d.value}
+              </span>
+            ))}
+
           {/* Dot + tooltip are HTML so they stay round and crisp while the SVG stretches. */}
-          {markerPoint && markerIndex !== null && (
+          {!showValues && markerPoint && markerIndex !== null && (
             <span
               className={styles.marker}
               data-visible={active !== null || undefined}

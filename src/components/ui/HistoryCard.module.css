@@ -13,7 +13,8 @@
 .header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  /* Extra 40px of breathing room; the card sizes to this row, so the chart widens with it. */
+  gap: 48px;
   padding: 16px;
 }
 

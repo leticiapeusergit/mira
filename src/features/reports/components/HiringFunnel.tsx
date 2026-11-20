@@ -4,13 +4,13 @@ import { Card } from "@/components/ui/Card";
 import { HistoryCard } from "@/components/ui/HistoryCard";
 import { HoverCard } from "@/components/ui/HoverCard";
 import { Legend } from "@/components/ui/Legend";
-import { FUNNEL, FUNNEL_LEGEND, FUNNEL_MAX } from "../data";
+import { FUNNEL, FUNNEL_LEGEND, FUNNEL_MAX, FUNNEL_TICKS } from "../data";
 import { countAxis, periodSeries, trendFromSeries } from "../history";
 import { useReportsPeriod } from "../ReportsPeriodContext";
 import styles from "./HiringFunnel.module.css";
 
-const BAR_AREA = 153; // px height of the tallest bar
-const TICKS = [200, 150, 100, 50, 0];
+/** Bars and ticks share one scale so 200 sits exactly on the 200 tick. */
+const SCALE_MAX = FUNNEL_MAX;
 
 export function HiringFunnel() {
   const { windows } = useReportsPeriod();
@@ -24,10 +24,14 @@ export function HiringFunnel() {
 
       <div className={styles.chart}>
         <div className={styles.yAxis} aria-hidden>
-          <span>Candidates</span>
-          {TICKS.map((t) => (
-            <span key={t}>{t}</span>
-          ))}
+          <span className={styles.yTitle}>Candidates</span>
+          <div className={styles.ticks}>
+            {FUNNEL_TICKS.map((t) => (
+              <span key={t} style={{ bottom: `${(t / SCALE_MAX) * 100}%` }}>
+                {t}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className={styles.plot}>
@@ -56,11 +60,12 @@ export function HiringFunnel() {
                     <span
                       className={styles.bar}
                       style={{
-                        height: Math.max(4, (value / FUNNEL_MAX) * BAR_AREA),
+                        height: `max(10px, ${(value / SCALE_MAX) * 100}%)`,
                         background: stage.color,
+                        ["--i" as string]: i,
                       }}
                     >
-                      <span className={styles.tooltip}>{value}</span>
+                      <span className={styles.value}>{value}</span>
                     </span>
                   </HoverCard>
                 </div>

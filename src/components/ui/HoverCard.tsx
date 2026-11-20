@@ -9,7 +9,7 @@ type HoverCardProps = {
   children: React.ReactNode;
   /** Content shown in the floating card. */
   content: React.ReactNode;
-  /** Card width in px. Omit to size to content (min 262px). */
+  /** Card width in px. Omit to size to content (min 302px). */
   width?: number;
   /** Size to content with no minimum width (for small tooltips). */
   compact?: boolean;

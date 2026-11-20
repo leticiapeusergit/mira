@@ -5,14 +5,15 @@ import { ALERTS, KPIS, type KpiKey } from "../data";
 import { periodSeries } from "../history";
 import { useReportsPeriod } from "../ReportsPeriodContext";
 import { AlertCard } from "./AlertCard";
+import { HiringFunnel } from "./HiringFunnel";
 import { KpiCard } from "./KpiCard";
-import { TeamFilters } from "./TeamFilters";
+import { MedianVacancyAgeCard } from "./MedianVacancyAgeCard";
 import { VacanciesCard } from "./VacanciesCard";
 import page from "../ReportsPage.module.css";
 import styles from "./TeamPerformanceSection.module.css";
 
 /**
- * Team Performance: clicking an alert focuses the KPI it refers to
+ * Performance: clicking an alert focuses the KPI it refers to
  * (highlights it, dims the rest, scrolls it into view). Click again or press Esc to clear.
  */
 export function TeamPerformanceSection() {
@@ -29,13 +30,10 @@ export function TeamPerformanceSection() {
   }, [focused]);
 
   return (
-    <section className={page.section} aria-labelledby="team-performance">
-      <div className={page.sectionHeader}>
-        <h2 id="team-performance" className={page.sectionTitle}>
-          Team Performance
-        </h2>
-        <TeamFilters />
-      </div>
+    <section className={styles.section} aria-labelledby="performance">
+      <h2 id="performance" className={page.sectionTitle}>
+        Performance
+      </h2>
 
       <div className={page.row}>
         {ALERTS.map((alert) => (
@@ -67,7 +65,11 @@ export function TeamPerformanceSection() {
       </div>
 
       <div className={styles.rest} data-dimmed={focused ? "" : undefined}>
-        <VacanciesCard />
+        <HiringFunnel />
+        <div className={styles.vacancies}>
+          <VacanciesCard />
+          <MedianVacancyAgeCard />
+        </div>
       </div>
     </section>
   );

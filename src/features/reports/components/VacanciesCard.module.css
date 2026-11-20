@@ -1,14 +1,13 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-bottom: 4px;
 }
 
 .title {
@@ -19,50 +18,151 @@
   color: #000;
 }
 
-.bar {
-  display: flex;
-  height: 15px;
-  border-radius: 4px;
-  transform-origin: left;
-  animation: grow-right 800ms var(--ease-out) 200ms backwards;
+/* y-axis | stacked columns, then period labels. */
+.chart {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 112px auto;
+  gap: 6px 16px;
+  padding-top: 30px;
 }
 
-@keyframes grow-right {
+.yAxis {
+  position: relative;
+  width: 18px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--gray-500);
+  text-align: right;
+}
+
+.yAxis > span {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+}
+
+.columns {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.column {
+  display: flex;
+  align-items: flex-end;
+  align-self: stretch;
+  width: 130px;
+  min-width: 0;
+}
+
+.stack {
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  width: 100%;
+  transform-origin: bottom;
+  animation: grow-up 700ms var(--ease-out) backwards;
+  animation-delay: calc(200ms + var(--i, 0) * 80ms);
+}
+
+@keyframes grow-up {
   from {
-    transform: scaleX(0);
+    transform: scaleY(0);
   }
 }
 
-/* HoverCard root becomes the flex item; its share of the bar comes from the fill's flex-grow. */
+/* Column total in a black bubble with a pointer. */
+.total {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 1;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #000;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--white);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.total::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  background: inherit;
+  border-radius: 1px;
+  transform: translate(-50%, -4px) rotate(45deg);
+}
+
+/* HoverCard root: share of the column comes from flex-grow (the value). */
 .segment {
   flex-basis: 0;
-  min-width: 0;
-  height: 100%;
-}
-
-.segment:first-child .fill {
-  border-radius: 4px 0 0 4px;
-}
-
-.segment:last-child .fill {
-  border-radius: 0 4px 4px 0;
+  min-height: 2px;
 }
 
 .fill {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
   transition: filter var(--duration-fast) var(--ease-out);
+}
+
+.segment:last-child .fill {
+  border-radius: var(--round-soft) var(--round-soft) 0 0;
 }
 
 .segment:hover .fill {
   filter: brightness(0.94);
 }
 
-.positive {
-  color: var(--teal-700);
+.column:hover .segmentValue,
+.column:focus-within .segmentValue {
+  opacity: 1;
 }
 
-.muted {
+/* Segment numbers appear on hover only; the column total stays visible. */
+.segmentValue {
+  opacity: 0;
+  transition: opacity var(--duration-base) var(--ease-out);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gray-800);
+  font-variant-numeric: tabular-nums;
+}
+
+.fill[data-key="cancelled"] .segmentValue {
+  color: var(--white);
+}
+
+.xAxis {
+  display: flex;
+  grid-column: 2;
+  justify-content: space-between;
+  gap: 24px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
   color: var(--gray-500);
+}
+
+.xAxis > span {
+  width: 130px;
+}
+
+.xAxis > span[data-current] {
+  font-weight: 700;
+  color: var(--purple-600);
 }

@@ -6,50 +6,99 @@ import type { HistorySpec } from "./history";
  * Replace with API data once the reporting endpoints exist.
  */
 
-/* ---------- Time in process (stacked timelines) ---------- */
+/* ---------- Real time data ---------- */
+
+export const REAL_TIME_STATS = [
+  { label: "Open Vacancies", value: 67 },
+  { label: "Open Positions", value: 67 },
+  { label: "Active Clients", value: 1432 },
+  { label: "Open Job Applications", value: 234 },
+];
+
+/* ---------- Process efficiency ---------- */
 
 export type TimelineStage = { key: string; label: string; color: string };
-export type TimelineRow = { month: string; days: number[] };
-export type StageTimeline = { title: string; stages: TimelineStage[]; rows: TimelineRow[] };
 
-/** Business days spent per stage, per month (values measured from the Figma mock). */
-const PROCESS_DAYS: TimelineRow[] = [
-  { month: "October", days: [4.9, 6.8, 5.6, 2.8, 2.4, 3.5] },
-  { month: "September", days: [4.1, 8.2, 2.6, 4.0, 3.8, 3.8] },
-  { month: "August", days: [4.0, 9.1, 3.6, 2.2, 2.7, 5.5] },
-  { month: "July", days: [3.9, 5.6, 3.9, 4.1, 4.0, 4.6] },
-  { month: "June", days: [5.2, 5.2, 3.2, 5.1, 3.0, 6.1] },
-  { month: "May", days: [4.0, 1.7, 7.7, 5.2, 4.9, 3.2] },
-];
+/**
+ * Business days per stage for the selected period (left) and,
+ * when the card is expanded, for the periods before it.
+ */
+export type StageTimeline = {
+  title: string;
+  stages: TimelineStage[];
+  /** Days per stage in the selected period, measured from the Figma bars (30 BD = full track). */
+  current: number[];
+  /** Keeps each mock history distinct. */
+  seed: number;
+};
+
+/** Duration of individual tasks inside a process, in business days. */
+export type TaskBar = { key: string; label: string; color: string; history: HistorySpec };
+export type TaskDurationChart = { title: string; tasks: TaskBar[] };
+
+export type ProcessRow = { timeline: StageTimeline; tasks: TaskDurationChart };
 
 export const TIMELINE_MAX_DAYS = 30;
+export const TASK_AXIS = [30, 25, 20, 15, 10, 5, 0];
 
-/** Stage labels use "\n" where the Figma legend wraps. */
-export const PROCESS_EFFICIENCY: StageTimeline[] = [
+/** Labels use "\n" where the Figma legend wraps. */
+export const PROCESS_EFFICIENCY: ProcessRow[] = [
   {
-    title: "Prediktive Process Time",
-    stages: [
-      { key: "hr-scheduling", label: "HR\nScheduling", color: "var(--bluegray-100)" },
-      { key: "hr-interview", label: "HR\nInterview", color: "var(--bluegray-200)" },
-      { key: "technical-review", label: "Technical\nReview", color: "var(--bluegray-300)" },
-      { key: "technical-evaluation", label: "Technical\nEvaluation", color: "var(--bluegray-500)" },
-      { key: "final-decision", label: "Final\nDecision", color: "var(--brand-950)" },
-      { key: "tests", label: "Tests", color: "var(--gray-300)" },
-    ],
-    rows: PROCESS_DAYS,
+    timeline: {
+      title: "Internal Process Time",
+      seed: 1,
+      stages: [
+        { key: "new", label: "New", color: "var(--bluegray-100)" },
+        { key: "hr-assessment", label: "HR\nAssessment", color: "var(--bluegray-200)" },
+        { key: "general-tests", label: "General\nTests", color: "var(--bluegray-300)" },
+        { key: "technical-evaluation", label: "Technical\nEvaluation", color: "var(--bluegray-500)" },
+        { key: "profile-publishing", label: "Profile\nPublishing", color: "var(--brand-950)" },
+        { key: "completed", label: "Completed", color: "var(--gray-300)" },
+      ],
+      current: [4.9, 6.8, 5.6, 2.8, 2.4, 6],
+    },
+    tasks: {
+      title: "Internal Task Duration",
+      tasks: [
+        { key: "hr-interview", label: "HR Interview", color: "var(--brand-100)", history: { current: 9, previous: 10, seed: 41, lowerIsBetter: true, min: 1, max: 30 } },
+        { key: "coding-challenge", label: "Coding Challenge", color: "var(--brand-200)", history: { current: 17, previous: 15, seed: 42, lowerIsBetter: true, min: 1, max: 30 } },
+        { key: "technical-interview", label: "Technical Interview", color: "var(--brand-400)", history: { current: 30, previous: 26, seed: 43, lowerIsBetter: true, min: 1, max: 30 } },
+        { key: "profile-review", label: "Profile Review", color: "var(--brand-500)", history: { current: 20, previous: 21, seed: 44, lowerIsBetter: true, min: 1, max: 30 } },
+      ],
+    },
   },
   {
-    title: "Job Application Process Time",
-    stages: [
-      { key: "technical-evaluation", label: "Technical\nEvaluation", color: "var(--purple-100)" },
-      { key: "passed-tech", label: "Passed Tech\nAssessment", color: "var(--purple-200)" },
-      { key: "presented", label: "Presented\nto Client", color: "var(--purple-300)" },
-      { key: "offer", label: "Offer\nExtended", color: "var(--purple-500)" },
-      { key: "hired", label: "Hired", color: "var(--purple-900)" },
-    ],
-    rows: PROCESS_DAYS.map((r) => ({ month: r.month, days: r.days.slice(0, 5) })),
+    timeline: {
+      title: "Job Application Process Time",
+      seed: 2,
+      stages: [
+        { key: "internal-review", label: "Internal\nReview", color: "var(--purple-100)" },
+        { key: "presentation", label: "Presentation", color: "var(--purple-200)" },
+        { key: "client-evaluation", label: "Client\nEvaluation", color: "var(--purple-300)" },
+        { key: "client-definition", label: "Client\nDefinition", color: "var(--purple-400)" },
+        { key: "pre-hiring", label: "Pre-Hiring", color: "var(--purple-600)" },
+        { key: "offer", label: "Offer", color: "var(--purple-800)" },
+        { key: "onboarding", label: "Onboarding", color: "var(--purple-950)" },
+        { key: "hired", label: "Hired", color: "var(--gray-300)" },
+      ],
+      current: [5.1, 4.4, 6.3, 5.1, 2.3, 1.8, 0.9, 1.8],
+    },
+    tasks: {
+      title: "Job Application Tasks Duration",
+      tasks: [
+        { key: "client-interview", label: "Client\nInterview", color: "rgba(193, 245, 234, 0.83)", history: { current: 9, previous: 11, seed: 51, lowerIsBetter: true, min: 1, max: 30 } },
+        { key: "client-evaluation", label: "Client\nEvaluation", color: "var(--teal-200)", history: { current: 17, previous: 16, seed: 52, lowerIsBetter: true, min: 1, max: 30 } },
+        { key: "pre-hiring-session", label: "Pre Hiring\nSession", color: "var(--teal-400)", history: { current: 26, previous: 24, seed: 53, lowerIsBetter: true, min: 1, max: 30 } },
+        { key: "verbal-offer", label: "Verbal\nOffer", color: "var(--teal-600)", history: { current: 24, previous: 25, seed: 54, lowerIsBetter: true, min: 1, max: 30 } },
+        { key: "offer-letter", label: "Offer\nLetter", color: "var(--teal-800)", history: { current: 20, previous: 22, seed: 55, lowerIsBetter: true, min: 1, max: 30 } },
+        { key: "onboarding-request", label: "Onboarding\nRequest", color: "var(--teal-900)", history: { current: 20, previous: 19, seed: 56, lowerIsBetter: true, min: 1, max: 30 } },
+      ],
+    },
   },
 ];
+
+/** Median days a vacancy has been open. */
+export const MEDIAN_VACANCY_AGE: HistorySpec = { current: 23, previous: 25, seed: 61, lowerIsBetter: true, min: 5, max: 60 };
 
 /* ---------- Team performance ---------- */
 
@@ -150,10 +199,10 @@ export const VACANCIES: VacancySegment[] = [
   {
     key: "cancelled",
     label: "Cancelled",
-    color: "var(--gray-500)",
+    color: "var(--gray-600)",
     history: { current: 3, previous: 2, seed: 12, lowerIsBetter: true },
   },
-  { key: "open", label: "Open", color: "var(--purple-300)", history: { current: 45, previous: 47, seed: 13, lowerIsBetter: true } },
+  { key: "open", label: "Open", color: "var(--purple-200)", history: { current: 45, previous: 47, seed: 13, lowerIsBetter: true } },
 ];
 
 /* ---------- Recruiter performance ---------- */
@@ -371,26 +420,33 @@ export type FunnelStage = {
 };
 
 export const FUNNEL_MAX = 215;
+export const FUNNEL_TICKS = [200, 150, 100, 50, 0];
 
 export const FUNNEL: FunnelStage[] = [
-  { label: "Technically Evaluated", color: "rgba(193, 245, 234, 0.83)", history: { current: 215, previous: 207, seed: 31 } },
-  { label: "Passed Tech Assessment", color: "var(--teal-300)", history: { current: 146, previous: 140, seed: 32 } },
-  { label: "Presented\nto Client", color: "var(--purple-300)", history: { current: 132, previous: 129, seed: 33 } },
-  { label: "Interviewed\nby Client", color: "var(--purple-400)", history: { current: 85, previous: 88, seed: 34 } },
-  { label: "Offer\nExtended", color: "var(--purple-500)", history: { current: 25, previous: 26, seed: 35 } },
-  { label: "Hired", color: "var(--purple-600)", history: { current: 12, previous: 11, seed: 36 } },
+  { label: "Technically Evaluated", color: "var(--bluegray-200)", history: { current: 215, previous: 207, seed: 31 } },
+  { label: "Passed Tech Assessment", color: "var(--bluegray-300)", history: { current: 175, previous: 168, seed: 32 } },
+  { label: "Presented\nto Client", color: "var(--purple-300)", history: { current: 148, previous: 141, seed: 33 } },
+  { label: "Interviewed\nby Client", color: "var(--purple-400)", history: { current: 112, previous: 115, seed: 34 } },
+  { label: "Offer\nExtended", color: "var(--purple-500)", history: { current: 36, previous: 34, seed: 35 } },
+  { label: "Hired", color: "var(--purple-600)", history: { current: 24, previous: 22, seed: 36 } },
 ];
 
 export const FUNNEL_LEGEND = [
-  { label: "Internal", color: "var(--teal-600)" },
+  { label: "Internal", color: "var(--bluegray-300)" },
   { label: "External", color: "var(--purple-500)" },
 ];
 
-export const LOWEST_CONVERSION = {
-  from: "Interviewed",
-  to: "Offer",
-  numerator: 25,
-  numeratorLabel: "offers",
-  denominator: 85,
-  denominatorLabel: "interviews",
-};
+/* ---------- Recruiter status per period ---------- */
+
+/** Where a recruiter stood in one period: all targets met, flagged for review, or in between. */
+export type TargetStatus = "met" | "review" | "partial";
+
+/** Oldest → selected period, from the Meeting All Targets / Needs Review streaks. */
+export function recruiterStatusHistory(name: string): TargetStatus[] {
+  const streakIn = (id: RecruiterGroup["id"]) =>
+    RECRUITER_GROUPS.find((g) => g.id === id)?.recruiters.find((r) => r.name === name)?.streak;
+  const met = streakIn("meeting");
+  const review = streakIn("needs-review");
+  const length = met?.length ?? review?.length ?? 0;
+  return Array.from({ length }, (_, i) => (met?.[i] ? "met" : review?.[i] ? "review" : "partial"));
+}

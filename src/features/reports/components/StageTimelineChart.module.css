@@ -1,15 +1,46 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 16px 0;
 }
 
 .title {
-  padding-bottom: 4px;
+  flex: 1;
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
   color: #000;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  margin: -8px 0 -8px;
+  padding: 0 8px;
+  border-radius: var(--round-soft);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.toggle:hover {
+  background: var(--purple-50);
+}
+
+.toggle img {
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.toggle[data-open] img {
+  transform: rotate(180deg);
 }
 
 .chart {
@@ -17,37 +48,20 @@
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-}
-
-.rows {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.row {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.month {
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 1.4;
-  color: var(--gray-600);
+  padding: 16px;
 }
 
 .track {
   display: flex;
   gap: 2px;
-  height: 15px;
+  height: 20px;
   transform-origin: left;
   animation: grow-right 800ms var(--ease-out) backwards;
-  animation-delay: calc(150ms + var(--row, 0) * 70ms);
+  animation-delay: calc(150ms + var(--row, 0) * 60ms);
+}
+
+.track[data-size="sm"] {
+  height: 12px;
 }
 
 @keyframes grow-right {
@@ -65,14 +79,18 @@
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 2px;
+  border-radius: 8px;
   transition:
     opacity var(--duration-base) var(--ease-out),
     transform var(--duration-base) var(--ease-out);
 }
 
+.track[data-size="sm"] .fill {
+  border-radius: 4px;
+}
+
 .segment:hover .fill {
-  transform: scaleY(1.25);
+  transform: scaleY(1.15);
 }
 
 .fill[data-dim] {
@@ -104,18 +122,82 @@
   transform: translateX(-100%);
 }
 
+/* Height animation via grid rows: 0fr → 1fr. */
+.history {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--duration-slow) var(--ease-out),
+    opacity var(--duration-slow) var(--ease-out);
+}
+
+.history[data-open] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+.history[data-open] .rows {
+  padding-top: 8px;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowLabel {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--gray-600);
+}
+
+.rowLabel[data-current] {
+  max-height: 14px;
+  margin-bottom: -4px;
+  overflow: hidden;
+  font-weight: 700;
+  color: var(--purple-600);
+  transition:
+    max-height var(--duration-slow) var(--ease-out),
+    margin var(--duration-slow) var(--ease-out),
+    opacity var(--duration-slow) var(--ease-out);
+}
+
+/* Collapsed: no label above the selected bar, as in the design. */
+.rowLabel[data-hidden] {
+  max-height: 0;
+  margin-bottom: -8px;
+  opacity: 0;
+}
+
 .legend {
   display: flex;
-  gap: 16px;
-  margin: 0;
-  padding: 16px 0 0;
-  border-top: 1px solid var(--divider-strong);
+  justify-content: space-between;
+  gap: 12px;
+  margin: auto 0 0;
+  padding: 16px;
+  border-radius: var(--round-soft);
+  background: var(--purple-50);
   list-style: none;
 }
 
 .legendItem {
   display: flex;
-  flex: 1 1 0;
+  flex: 0 1 auto;
   flex-direction: column;
   gap: 4px;
   min-width: 0;

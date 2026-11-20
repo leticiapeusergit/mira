@@ -45,3 +45,30 @@
     opacity var(--duration-slow) var(--ease-out),
     filter var(--duration-slow) var(--ease-out);
 }
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rest {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Vacancies chart takes the row; the median card keeps its Figma width. */
+.vacancies {
+  display: flex;
+  gap: 16px;
+}
+
+.vacancies > :first-child {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.vacancies > :last-child {
+  flex: 0 0 172px;
+}
