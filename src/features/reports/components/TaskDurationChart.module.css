@@ -10,7 +10,7 @@
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
-  color: #000;
+  color: var(--gray-800);
 }
 
 /* y-axis | columns, then x labels under the columns. */

@@ -22,21 +22,42 @@ const MIN_LABELLED = 10;
 
 const shortMonth = new Intl.DateTimeFormat("en-US", { month: "short" });
 
+/** Calendar months back from the hovered one shown in its history. */
+const HISTORY_MONTHS = 6;
+
+const monthKey = (d: Date) => d.getFullYear() * 12 + d.getMonth();
+
 /**
- * One point per month of the selected period. The last month is `current`, the one before `previous`;
- * earlier months are mock values inside the spec's min–max range.
+ * Mock value for one calendar month: the latest month of the selected period is `current`,
+ * the month before it `previous`, any other month a stable value inside the spec's min–max range.
  */
-function monthlySeries(months: { start: Date; end: Date }[], spec: HistorySpec): ChartPoint[] {
+function monthValue(spec: HistorySpec, key: number, latestKey: number): number {
   const { current, previous, seed, min = current, max = current } = spec;
-  const n = months.length;
-  return months.map((m, i) => {
-    const value =
-      i === n - 1
-        ? current
-        : i === n - 2
-          ? previous
-          : Math.round(min + (max - min) * (0.5 + 0.5 * Math.sin(seed * 1.7 + i * 2.3)));
-    return { label: shortMonth.format(m.start), detail: windowRange({ ...m, days: 0 }), value };
+  if (key === latestKey) return current;
+  if (key === latestKey - 1) return previous;
+  return Math.round(min + (max - min) * (0.5 + 0.5 * Math.sin(seed * 1.7 + key * 2.3)));
+}
+
+/** One point per month of the selected period (the columns). */
+function monthlySeries(months: { start: Date; end: Date }[], spec: HistorySpec): ChartPoint[] {
+  const latestKey = months.length ? monthKey(months[months.length - 1].start) : 0;
+  return months.map((m) => ({
+    label: shortMonth.format(m.start),
+    detail: windowRange({ ...m, days: 0 }),
+    value: monthValue(spec, monthKey(m.start), latestKey),
+  }));
+}
+
+/** The 6 calendar months ending at `month`, for the hover history. */
+function sixMonthHistory(month: Date, spec: HistorySpec, latestKey: number): ChartPoint[] {
+  return Array.from({ length: HISTORY_MONTHS }, (_, i) => {
+    const start = new Date(month.getFullYear(), month.getMonth() - (HISTORY_MONTHS - 1 - i), 1);
+    const end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+    return {
+      label: shortMonth.format(start),
+      detail: windowRange({ start, end, days: 0 }),
+      value: monthValue(spec, monthKey(start), latestKey),
+    };
   });
 }
 
@@ -53,6 +74,7 @@ export function VacanciesCard() {
   });
   const columns = months.map((_, i) => i);
   const last = months.length - 1;
+  const latestKey = months.length ? monthKey(months[last].start) : 0;
   // Legend reads Filled · Cancelled · Open like the design.
   const legend = ["filled", "cancelled", "open"].map((k) => VACANCIES.find((v) => v.key === k)!);
 
@@ -89,8 +111,8 @@ export function VacanciesCard() {
                   {segments.map((s) => {
                     const value = s.series[w].value;
                     if (value <= 0) return null;
-                    // Each segment's history runs up to this column's period.
-                    const upTo = s.series.slice(0, w + 1);
+                                        // The 6 months up to this column's month (can reach before the selected period).
+                    const upTo = sixMonthHistory(months[w].start, s.history, latestKey);
                     return (
                       <HoverCard
                         key={s.key}

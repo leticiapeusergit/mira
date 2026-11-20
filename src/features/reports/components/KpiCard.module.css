@@ -4,11 +4,17 @@
   overflow: hidden;
 }
 
+/* The chart area takes the rest of the card, so cards in a row end flush. */
+.card > :last-child {
+  flex: 1;
+  padding: 30px 20px 20px;
+}
+
 .top {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px 16px 8px;
+  gap: 12px;
+  padding: 20px;
 }
 
 .heading {
@@ -21,7 +27,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -34,10 +40,10 @@
 }
 
 .target {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.4;
-  color: var(--bluegray-400);
+  color: var(--gray-400);
 }
 
 .badge {
@@ -45,9 +51,9 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  width: 80px;
+  min-width: 80px;
   min-height: 56px;
-  padding: 8px 4px;
+  padding: 8px 20px;
   border-radius: var(--round-hard);
   background: var(--error-25);
   color: var(--error-600);

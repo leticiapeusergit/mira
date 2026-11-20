@@ -1,7 +1,7 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
 }
 
 .header {
@@ -15,7 +15,7 @@
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
-  color: #000;
+  color: var(--gray-800);
 }
 
 /* y-axis | stacked columns, then period labels. */
